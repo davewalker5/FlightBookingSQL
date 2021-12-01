@@ -41,7 +41,6 @@ def delete_passenger(flight_id, passenger_id):
     :param flight_id: ID for the flight from which to remove the passenger
     :param passenger_id: ID of the passenger to delete
     """
-    print(f"Deleting passenger {passenger_id}")
     with Session.begin() as session:
         flight = session.query(Flight).get(flight_id)
         passenger = session.query(Passenger).get(passenger_id)

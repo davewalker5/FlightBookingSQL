@@ -38,7 +38,6 @@ class TestSeatAllocations(unittest.TestCase):
             flight = session.query(Flight)\
                 .options(joinedload(Flight.aircraft_layout))\
                 .one()
-            print(flight)
 
             self.assertEqual("A321", flight.aircraft_layout.aircraft)
             self.assertEqual("Neo", flight.aircraft_layout.name)
