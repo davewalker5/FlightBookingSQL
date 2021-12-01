@@ -10,7 +10,7 @@ import datetime
 from flask import Flask, render_template, redirect, request, session
 from flight_model.logic import list_flights, create_flight, get_flight, delete_flight, add_passenger
 from flight_model.logic import list_airlines, list_airports
-from flight_model.logic import list_layouts, apply_aircraft_layout
+from flight_model.logic import list_layouts, apply_aircraft_layout, allocate_seat
 from flight_model.logic import create_passenger, delete_passenger
 
 app = Flask("Flight Booking")
@@ -100,6 +100,7 @@ def _render_layout_selection_page(flight_id, error):
     Helper to render the aircraft layout selection page
 
     :param flight_id: The ID of the flight record
+    :param error: Error message to display on the page or None
     :return: The rendered layout selection template
     """
     # Get the flight, airline and, if there's a seating plan on the flight, the aircraft layout
@@ -205,3 +206,39 @@ def delete_passenger_from_flight(flight_id, passenger_id):
                            passengers=passengers,
                            flight=flight,
                            edit_enabled=False)
+
+
+@app.route("/allocate_seat/<int:flight_id>/<int:passenger_id>", methods=["GET", "POST"])
+def allocate_seat_to_passenger(flight_id, passenger_id):
+    """
+    Serve the page prompting for a seat allocation for a single passenger
+
+    :param flight_id: ID of the flight the passenger is associated with
+    :param passenger_id: Unique identifier for the passenger to allocate to a seat
+    :return: The HTML for the seat allocation page or a response object redirecting to the passenger details page
+    """
+    if request.method == "POST":
+        try:
+            allocate_seat(flight_id, passenger_id, request.form["seat_number"])
+            return redirect(f"/list_passengers/{flight_id}")
+        except ValueError as e:
+            return _render_seat_allocation_page(flight_id, passenger_id, e)
+    else:
+        return _render_seat_allocation_page(flight_id, passenger_id, None)
+
+
+def _render_seat_allocation_page(flight_id, passenger_id, error):
+    """
+    Helper to render the page to allocate a seat to a passenger
+
+    :param flight_id: ID of the flight the passenger is associated with
+    :param passenger_id: Unique identifier for the passenger to allocate to a seat
+    :param error: Error message to display on the page or None
+    :return: The HTML for the seat allocation page
+    """
+    flight = get_flight(flight_id)
+    passengers = [p for p in flight.passengers if p.id == passenger_id]
+    return render_template("allocate_seat.html",
+                           flight=flight,
+                           passengers=passengers,
+                           error=error)

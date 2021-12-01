@@ -148,3 +148,31 @@ def apply_aircraft_layout(flight_id, aircraft_layout_id):
     # who were in those seats, move them to the next available seats
     if not_allocated:
         _allocate_available_seats(flight_id, not_allocated)
+
+
+def allocate_seat(flight_id, passenger_id, seat_number):
+    with Session.begin() as session:
+        flight = session.query(Flight).get(flight_id)
+
+        if not flight.seats:
+            raise ValueError("The flight does not have an aircraft layout")
+
+        passenger_ids = [passenger.id for passenger in flight.passengers]
+        if passenger_id not in passenger_ids:
+            raise ValueError("The passenger doesn't belong to the specified flight")
+
+        required_seat = [seat for seat in flight.seats if seat.seat_number == seat_number]
+        if not required_seat:
+            raise ValueError("The specified seat does not exist on the flight")
+
+        if required_seat[0].passenger_id == passenger_id:
+            raise ValueError("The seat is already allocated to the passenger")
+
+        if required_seat[0].passenger_id is not None:
+            raise ValueError("The seat is already allocated to another passenger")
+
+        current_seat = [seat for seat in flight.seats if seat.passenger_id == passenger_id]
+        if current_seat:
+            current_seat[0].passenger_id = None
+
+        required_seat[0].passenger_id = passenger_id

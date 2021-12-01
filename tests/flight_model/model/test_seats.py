@@ -2,7 +2,7 @@ import datetime
 import unittest
 from sqlalchemy.exc import NoResultFound
 from src.flight_model.model import create_database, Session, Flight, Seat, Passenger
-from tests.flight_model.model.utils import create_test_airport, create_test_airline, create_test_flight, \
+from tests.flight_model.utils import create_test_airport, create_test_airline, create_test_flight, \
     create_test_layout, create_test_passenger, create_test_seating_plan
 
 

@@ -1,7 +1,7 @@
 import unittest
 import datetime
 from src.flight_model.model import create_database, Session, Flight, Passenger
-from tests.flight_model.model.utils import create_test_airport, create_test_airline, create_test_flight, \
+from tests.flight_model.utils import create_test_airport, create_test_airline, create_test_flight, \
     create_test_passenger
 
 

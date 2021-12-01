@@ -24,7 +24,14 @@ Running the Application
 To run the application, a virtual environment should be created, the requirements should be installed using pip and the
 environment should be activated.
 
-With those pre-requisites in place, to run the web-based application in the Flask development web server, enter the
+With those pre-requisites in place, to populate the database with sample data run the following commands from the
+"src" folder:
+
+::
+
+    python -m flight_model
+
+With the sample data in place, to run the web-based application in the Flask development web server, enter the
 following from the "src/booking_web" folder:
 
 ::

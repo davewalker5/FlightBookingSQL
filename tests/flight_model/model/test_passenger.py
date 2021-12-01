@@ -2,7 +2,7 @@ import datetime
 import unittest
 from sqlalchemy.exc import NoResultFound, IntegrityError
 from src.flight_model.model import create_database, Session, Passenger
-from tests.flight_model.model.utils import create_test_passenger
+from tests.flight_model.utils import create_test_passenger
 
 
 class TestPassenger(unittest.TestCase):

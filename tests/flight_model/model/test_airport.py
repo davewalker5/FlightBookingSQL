@@ -1,7 +1,7 @@
 import unittest
 from sqlalchemy.exc import NoResultFound, IntegrityError
 from src.flight_model.model import create_database, Session, Airport
-from tests.flight_model.model.utils import create_test_airport
+from tests.flight_model.utils import create_test_airport
 
 
 class TestAirport(unittest.TestCase):
