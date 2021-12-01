@@ -99,8 +99,13 @@ web browser.
 Dependencies
 ============
 
-The flight booking application has dependencies listed in requirements.txt and also requires that one or more of the
-boarding card generators are installed to enable generation and saving boarding cards.
+The flight booking application has dependencies listed in requirements.txt and also requires that PDF boarding card
+generator is installed to enable generation and saving of boarding cards. The boarding card generators are part of the
+FlightBooking repository:
+
+https://github.com/davewalker5/FlightBookingSQL
+
+Please see the README files for that repository for further details.
 
 
 Distribution

@@ -12,6 +12,7 @@ from flight_model.logic import list_flights, create_flight, get_flight, delete_f
 from flight_model.logic import list_airlines, list_airports
 from flight_model.logic import list_layouts, apply_aircraft_layout, allocate_seat
 from flight_model.logic import create_passenger, delete_passenger
+from flight_model.logic import generate_boarding_cards, InvalidOperationError, MissingBoardingCardPluginError
 
 app = Flask("Flight Booking")
 app.secret_key = b'some secret key'
@@ -239,6 +240,30 @@ def _render_seat_allocation_page(flight_id, passenger_id, error):
     flight = get_flight(flight_id)
     passengers = [p for p in flight.passengers if p.id == passenger_id]
     return render_template("allocate_seat.html",
+                           options_map=options_map,
                            flight=flight,
                            passengers=passengers,
                            error=error)
+
+
+@app.route("/print_boarding_cards/<int:flight_id>", methods=["GET", "POST"])
+def print_boarding_cards(flight_id):
+    """
+    Serve the page to prompt for a gate number and generate boarding cards when the form is submitted
+
+    :return: The HTML for the boarding card generation page or a response object redirecting to /
+    """
+    if request.method == "POST":
+        try:
+            generate_boarding_cards(flight_id, "pdf", request.form["gate_number"])
+            session["message"] = "Boarding cards have been generated"
+        except (ValueError, InvalidOperationError, MissingBoardingCardPluginError) as e:
+            return render_template("print_boarding_cards.html",
+                                   flight=get_flight(flight_id),
+                                   error=e)
+        else:
+            return redirect("/")
+    else:
+        return render_template("print_boarding_cards.html",
+                               flight=get_flight(flight_id),
+                               error=None)
