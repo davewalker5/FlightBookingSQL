@@ -45,6 +45,8 @@ is running, browse to the following URL in a  web browser:
 Unit Tests and Coverage
 =======================
 
+Currently, the unit tests use a SQLite database as the back-end rather than mocking the database.
+
 To run the unit tests, a virtual environment should be created, the requirements should be installed using pip and the
 environment should be activated.
 
