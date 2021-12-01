@@ -1,0 +1,13 @@
+ <strong>
+    <nav>
+        <ul class="menu">
+            {% for option in options_map %}
+                <li>
+                    <a href="{{ url_for(options_map[loop.index0]['view']) }}">
+                        {{ options_map[loop.index0]["description"] }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</strong>

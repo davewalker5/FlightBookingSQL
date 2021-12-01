@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Current Flights{% endblock %}
+
+{% block content %}
+    {% if flights | length > 0 %}
+        <h1>Current Flights</h1>
+        {% include "error.html" with context %}
+        {% include "message.html" with context %}
+        {% include "flight_list.html" with context %}
+    {% else %}
+        {% include "instructions.html" with context %}
+    {% endif %}
+{% endblock %}

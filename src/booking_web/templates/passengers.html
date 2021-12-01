@@ -1,0 +1,55 @@
+{% if passengers | length > 0 %}
+    <table class="striped">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Date of Birth</th>
+                <th>Nationality</th>
+                <th>Residency</th>
+                <th>Passport Number</th>
+                <th>Seat</th>
+                {% if edit_enabled %}
+                    <th/>
+                    <th/>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for passenger in passengers %}
+                <tr class={{ "row-even" if loop.index %2 == 0 else "row-odd" }}>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ passenger.name }}</td>
+                    <td>{{ passenger.gender }}</td>
+                    <td>{{ passenger.dob.strftime("%d/%m/%Y") }}</td>
+                    <td>{{ passenger.nationality }}</td>
+                    <td>{{ passenger.residency }}</td>
+                    <td>{{ passenger.passport_number }}</td>
+                    <td>
+                        <!-- The model allows for multiple flight allocations per passenger and therefore multiple
+                             seat allocations but for the purposes of this demonstration this is restricted to one
+                             flight and one allocation per passenger -->
+                        {% if passenger.seats | length > 0 %}
+                            {{ passenger.seats[0].seat_number }}
+                        {% endif %}
+                    </td>
+                    {% if edit_enabled %}
+                        <td>
+                            <a href="#">
+                                <i class="fa fa-chair" title="Allocate Seat"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('delete_passenger_from_flight',
+                                                flight_id=flight.id,
+                                                passenger_id=passenger.id) }}">
+                                <i class="fa fa-trash" title="Delete Passenger"></i>
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

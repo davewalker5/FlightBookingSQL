@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Flight Booking</h1>
+            {% include "menu.html" with context %}
+        </div>
+    </header>
+    <div class="container">
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script/jquery-3.6.0.min.js') }}"></script>
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

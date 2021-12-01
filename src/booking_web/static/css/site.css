@@ -1,0 +1,155 @@
+/*
+ * The navigation bar styling is based on the following blog post:
+ *
+ * https://pythonhow.com/python-tutorial/flask/Adding-CSS-styling-to-your-website/
+ */
+
+
+/* --- Body styling -----------------------------–––------------------------- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #444;
+}
+
+.container {
+  width: 90vw;
+  margin: 0px auto;
+}
+
+.content {
+  margin-top: 25px;
+}
+
+/* --- Form button bar ------------------------------------------------------ */
+.button-bar {
+  margin-top: 25px;
+}
+
+.button-bar .btn-primary a:link {
+    color: white;
+}
+
+.button-bar .btn-primary a:visited {
+    color: white;
+}
+
+.button-bar .btn-primary a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.button-bar .btn-primary a:active {
+    color: white;
+}
+
+.button-bar .btn-light a:link {
+    color: black;
+}
+
+.button-bar .btn-light a:visited {
+    color: black;
+}
+
+.button-bar .btn-light a:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.button-bar .btn-light a:active {
+    color: black;
+}
+
+/* --- Title bar ------------------------------------------------------------ */
+header {
+  background-color: #3282a9;
+  height: 35px;
+  width: 100%;
+  opacity: .9;
+  margin-bottom: 10px;
+}
+
+header h1.logo {
+  margin-top: 3px;
+  font-size: 1.5em;
+  color: #fff;
+  text-transform: uppercase;
+  float: left;
+}
+
+body h1 {
+  font-size: 1.25em;
+}
+
+body h2 {
+  font-size: 1.15em;
+}
+
+/* --- Striped tables -----------------------------------–––----------------- */
+table.striped {
+    border: 1px solid grey;
+}
+
+table.striped tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table.striped th {
+    padding: 5px;
+}
+
+table.striped td {
+    padding: 5px;
+}
+
+div table.striped {
+    margin-bottom: 20px;
+}
+
+/* --- Instructions tables -----------------------------------–––------------ */
+table.instructions {
+}
+
+table.instructions tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table.instructions th {
+    padding: 5px;
+    vertical-align: top;
+}
+
+table.instructions td {
+    padding: 5px;
+    vertical-align: top;
+}
+
+/* --- Navigation -----------------------------------–––--------------------- */
+.menu {
+  float: right;
+  margin-top: 8px;
+}
+
+.menu li {
+  display: inline;
+}
+
+.menu li + li {
+  margin-left: 25px;
+}
+
+.menu li a {
+  color: white;
+  text-decoration: none;
+}
+
+/* --- Messages -------------------------------------–––--------------------- */
+
+div.error {
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid red;
+    background: pink;
+    color: red;
+}
