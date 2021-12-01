@@ -1,10 +1,10 @@
 import datetime
 import unittest
 from sqlalchemy.orm import joinedload
-from src.flight_model.model import create_database, Session, Flight, AircraftLayout, Passenger
-from src.flight_model.logic import apply_aircraft_layout
-from tests.flight_model.model.utils import create_test_airline, create_test_flight, create_test_layout, \
-    create_test_airport
+from src.flight_model.model import create_database, Session, Flight, AircraftLayout, Seat
+from src.flight_model.logic import apply_aircraft_layout, allocate_seat
+from tests.flight_model.utils import create_test_airline, create_test_flight, create_test_layout, \
+    create_test_airport, create_test_passengers_on_flight
 
 
 class TestSeatAllocations(unittest.TestCase):
@@ -50,18 +50,10 @@ class TestSeatAllocations(unittest.TestCase):
                     self.assertTrue(f"{row}{letter}" in seat_numbers)
 
     def test_cannot_apply_aircraft_layout_with_insufficient_capacity(self):
+        create_test_passengers_on_flight(20)
+
         with Session.begin() as session:
-            # Add some passengers to the flight
             flight = session.query(Flight).one()
-            for i in range(20):
-                passenger = Passenger(name=f"Passenger {i}",
-                                      gender="M",
-                                      dob=datetime.datetime(1970, 1, 1).date(),
-                                      nationality="UK",
-                                      residency="UK",
-                                      passport_number=str(i))
-                flight.passengers.append(passenger)
-                session.add(passenger)
 
             # Get a layout that doesn't have enough capacity
             aircraft_layout = session.query(AircraftLayout) \
@@ -74,3 +66,65 @@ class TestSeatAllocations(unittest.TestCase):
         # Attempt to apply the new aircraft layout to the flight
         with self.assertRaises(ValueError):
             apply_aircraft_layout(flight.id, aircraft_layout_id)
+
+    def test_can_allocate_seat(self):
+        create_test_passengers_on_flight(1)
+
+        with Session.begin() as session:
+            flight = session.query(Flight).one()
+            aircraft_layouts = session.query(AircraftLayout).all()
+
+        apply_aircraft_layout(flight.id, aircraft_layouts[0].id)
+        allocate_seat(flight.id, flight.passengers[0].id, "1A")
+
+        with Session.begin() as session:
+            seat = session.query(Seat).filter(Seat.seat_number == "1A").one()
+            self.assertEqual(flight.passengers[0].id, seat.passenger_id)
+
+    def test_cannot_allocate_seat_to_passenger_not_on_flight(self):
+        with Session.begin() as session:
+            flight = session.query(Flight).one()
+            aircraft_layouts = session.query(AircraftLayout).all()
+
+        apply_aircraft_layout(flight.id, aircraft_layouts[0].id)
+
+        with self.assertRaises(ValueError):
+            allocate_seat(flight.id, 1, "1A")
+
+    def test_cannot_allocate_non_existent_seat(self):
+        create_test_passengers_on_flight(1)
+
+        with Session.begin() as session:
+            flight = session.query(Flight).one()
+            aircraft_layouts = session.query(AircraftLayout).all()
+
+        apply_aircraft_layout(flight.id, aircraft_layouts[0].id)
+
+        with self.assertRaises(ValueError):
+            allocate_seat(flight.id, flight.passengers[0].id, "1000A")
+
+    def test_cannot_allocate_seat_to_passenger_twice(self):
+        create_test_passengers_on_flight(1)
+
+        with Session.begin() as session:
+            flight = session.query(Flight).one()
+            aircraft_layouts = session.query(AircraftLayout).all()
+
+        apply_aircraft_layout(flight.id, aircraft_layouts[0].id)
+        allocate_seat(flight.id, flight.passengers[0].id, "1A")
+
+        with self.assertRaises(ValueError):
+            allocate_seat(flight.id, flight.passengers[0].id, "1A")
+
+    def test_cannot_allocate_previously_allocated_seat(self):
+        create_test_passengers_on_flight(2)
+
+        with Session.begin() as session:
+            flight = session.query(Flight).one()
+            aircraft_layouts = session.query(AircraftLayout).all()
+
+        apply_aircraft_layout(flight.id, aircraft_layouts[0].id)
+        allocate_seat(flight.id, flight.passengers[0].id, "1A")
+
+        with self.assertRaises(ValueError):
+            allocate_seat(flight.id, flight.passengers[1].id, "1A")

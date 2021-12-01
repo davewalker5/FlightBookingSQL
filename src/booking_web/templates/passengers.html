@@ -36,7 +36,9 @@
                     </td>
                     {% if edit_enabled %}
                         <td>
-                            <a href="#">
+                            <a href="{{ url_for('allocate_seat_to_passenger',
+                                                flight_id=flight.id,
+                                                passenger_id=passenger.id) }}">
                                 <i class="fa fa-chair" title="Allocate Seat"></i>
                             </a>
                         </td>

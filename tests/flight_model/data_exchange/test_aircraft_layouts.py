@@ -1,7 +1,7 @@
 import unittest
 from src.flight_model.model import create_database, Session, AircraftLayout
 from src.flight_model.data_exchange import import_aircraft_layout
-from tests.flight_model.model.utils import create_test_airline
+from tests.flight_model.utils import create_test_airline
 
 
 class TestAircraftLayouts(unittest.TestCase):
