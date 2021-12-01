@@ -70,7 +70,7 @@ def create_test_passenger(name, gender, dob, nationality, residency, passport_nu
     :param residency: Passenger's country of residency
     :param passport_number: Passport number
     """
-    _ = create_passenger(name, gender, dob, nationality, residency, passport_number)
+    return create_passenger(name, gender, dob, nationality, residency, passport_number)
 
 
 def create_test_layout(airline_name, aircraft, name, rows, letters):
