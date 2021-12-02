@@ -137,3 +137,21 @@ def create_test_passengers_on_flight(number_of_passengers):
                                   passport_number=str(i))
             flight.passengers.append(passenger)
             session.add(passenger)
+
+
+def text_card_generator(card_details):
+    """
+    Stub card generator monkeypatched in for testing boarding card printing
+
+    :param card_details: Boarding card details
+    """
+    return "\n".join(card_details.values())
+
+
+def binary_card_generator(card_details):
+    """
+    Stub card generator monkeypatched in for testing boarding card printing
+
+    :param card_details: Boarding card details
+    """
+    return "\n".join(card_details.values()).encode("utf-8")

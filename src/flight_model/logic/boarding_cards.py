@@ -63,7 +63,7 @@ card_generator_map = {
 }
 
 
-def _get_boarding_card_path(flight_number, seat_number, departure_date, card_format):
+def get_boarding_card_path(flight_number, seat_number, departure_date, card_format):
     """
     Construct the path to a boarding card file
 
@@ -101,7 +101,10 @@ def generate_boarding_cards(flight_id, card_format, gate):
 
     if not flight.seats:
         # An empty sequence or None will be falsy
-        raise InvalidOperationError("Cannot print boarding cards if the flight has no seat allocations")
+        raise InvalidOperationError("Cannot print boarding cards if the flight has no aircraft layout")
+
+    if not flight.passengers:
+        raise InvalidOperationError("Cannot print boarding cards if the flight has no passengers")
 
     try:
         generator = card_generator_map[card_format]
@@ -132,7 +135,7 @@ def generate_boarding_cards(flight_id, card_format, gate):
         })
 
         # Write the card to a file
-        card_file_path = _get_boarding_card_path(flight.number, seat_number, flight.departure_date, card_format)
+        card_file_path = get_boarding_card_path(flight.number, seat_number, flight.departure_date, card_format)
         if isinstance(card_data, str):
             with open(card_file_path, mode="wt", encoding="utf-8") as f:
                 f.write(card_data)

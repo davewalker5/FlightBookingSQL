@@ -255,6 +255,7 @@ def print_boarding_cards(flight_id):
     """
     if request.method == "POST":
         try:
+            # TODO: This should be run on a background thread as it currently blocks the UI thread
             generate_boarding_cards(flight_id, "pdf", request.form["gate_number"])
             session["message"] = "Boarding cards have been generated"
         except (ValueError, InvalidOperationError, MissingBoardingCardPluginError) as e:
