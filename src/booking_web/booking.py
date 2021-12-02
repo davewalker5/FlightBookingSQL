@@ -19,7 +19,7 @@ app.secret_key = b'some secret key'
 
 options_map = [
     {
-        "description": "Create",
+        "description": "Create Flight",
         "view": "create_new_flight"
     },
     {
