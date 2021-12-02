@@ -4,7 +4,6 @@ Flight business logic
 
 import datetime
 import sqlalchemy as db
-from sqlalchemy.orm import joinedload
 from ..model import Session, Airline, Airport, Flight
 
 
@@ -79,7 +78,6 @@ def list_flights():
     with Session.begin() as session:
         flights = session.query(Flight) \
             .order_by(db.asc(Flight.departure_date)) \
-            .options(joinedload(Flight.airline)) \
             .all()
 
     return flights

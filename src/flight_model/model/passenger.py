@@ -27,7 +27,7 @@ class Passenger(Base):
     #: Collection of flights for this passenger
     flights = relationship("Flight", secondary="FLIGHT_PASSENGERS", back_populates="passengers")
     #: Collection of seat allocations for this passenger
-    seats = relationship("Seat", back_populates="passenger", cascade="all, delete, delete-orphan", lazy="joined")
+    seats = relationship("Seat", back_populates="passenger", lazy="joined")
 
     __tableargs__ = (
         CheckConstraint(gender.in_(["M", "F"])),

@@ -3,7 +3,7 @@ Aircraft layout and seat allocation business logic
 """
 
 from sqlalchemy.orm import joinedload
-from ..model import Session, AircraftLayout, Flight, Seat
+from ..model import Session, AircraftLayout, Flight, Seat, Passenger
 
 
 def list_layouts(airline_id):
@@ -101,10 +101,8 @@ def _copy_seat_allocations(flight_id, allocations):
         new_seats = {seat.seat_number: seat for seat in flight.seats}
         for seat_number, passenger_id in allocations:
             if seat_number in new_seats:
-                print(f"ALLOCATING {seat_number}")
                 new_seats[seat_number].passenger_id = passenger_id
             else:
-                print(f"CAN'T ALLOCATE {seat_number} TO {passenger_id}")
                 not_allocated.append(passenger_id)
 
     return not_allocated
@@ -151,6 +149,13 @@ def apply_aircraft_layout(flight_id, aircraft_layout_id):
 
 
 def allocate_seat(flight_id, passenger_id, seat_number):
+    """
+    Allocate a seat to a passenger
+
+    :param flight_id: ID of the flight
+    :param passenger_id: ID of the passenger
+    :param seat_number: Seat number to allocate e.g. 28A
+    """
     with Session.begin() as session:
         flight = session.query(Flight).get(flight_id)
 

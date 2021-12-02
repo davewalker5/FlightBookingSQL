@@ -70,7 +70,7 @@ def create_test_passenger(name, gender, dob, nationality, residency, passport_nu
     :param residency: Passenger's country of residency
     :param passport_number: Passport number
     """
-    _ = create_passenger(name, gender, dob, nationality, residency, passport_number)
+    return create_passenger(name, gender, dob, nationality, residency, passport_number)
 
 
 def create_test_layout(airline_name, aircraft, name, rows, letters):
@@ -137,3 +137,21 @@ def create_test_passengers_on_flight(number_of_passengers):
                                   passport_number=str(i))
             flight.passengers.append(passenger)
             session.add(passenger)
+
+
+def text_card_generator(card_details):
+    """
+    Stub card generator monkeypatched in for testing boarding card printing
+
+    :param card_details: Boarding card details
+    """
+    return "\n".join(card_details.values())
+
+
+def binary_card_generator(card_details):
+    """
+    Stub card generator monkeypatched in for testing boarding card printing
+
+    :param card_details: Boarding card details
+    """
+    return "\n".join(card_details.values()).encode("utf-8")
