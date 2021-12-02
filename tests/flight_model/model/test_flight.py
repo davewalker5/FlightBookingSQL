@@ -2,7 +2,8 @@ import unittest
 import datetime
 from sqlalchemy.exc import NoResultFound, IntegrityError
 from src.flight_model.model import create_database, Session, Airline, Flight
-from tests.flight_model.utils import create_test_airport, create_test_airline, create_test_flight
+from tests.flight_model.utils import create_test_airport, create_test_airline, create_test_flight, create_test_layout, \
+    create_test_seating_plan, create_test_passengers_on_flight
 
 class TestFlight(unittest.TestCase):
     def setUp(self) -> None:
@@ -60,3 +61,26 @@ class TestFlight(unittest.TestCase):
 
         with self.assertRaises(NoResultFound), Session.begin() as session:
             _ = session.query(Flight).filter(Flight.number == "U28549").one()
+
+    def test_flight_with_no_seats_has_no_capacity(self):
+        with Session.begin() as session:
+            flight = session.query(Flight).filter(Flight.number == "U28549").one()
+            self.assertEqual(0, flight.capacity)
+
+    def test_flight_with_seats_has_capacity(self):
+        create_test_layout("EasyJet", "A321", "Neo", 10, "ABCDEF")
+        create_test_seating_plan("U28549", "A321", "Neo")
+        with Session.begin() as session:
+            flight = session.query(Flight).filter(Flight.number == "U28549").one()
+            self.assertEqual(60, flight.capacity)
+            self.assertEqual(60, flight.available_capacity)
+
+    def test_flight_with_passengers_reduces_available_capacity(self):
+        create_test_layout("EasyJet", "A321", "Neo", 10, "ABCDEF")
+        create_test_seating_plan("U28549", "A321", "Neo")
+        create_test_passengers_on_flight(10)
+
+        with Session.begin() as session:
+            flight = session.query(Flight).filter(Flight.number == "U28549").one()
+            self.assertEqual(60, flight.capacity)
+            self.assertEqual(50, flight.available_capacity)

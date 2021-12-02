@@ -60,3 +60,8 @@ class TestFlights(unittest.TestCase):
 
         flight = get_flight(flight_id)
         self.assertEqual(1, len(flight.passengers))
+
+    def test_cannot_add_flight_with_same_departure_and_destination(self):
+        with self.assertRaises(ValueError):
+            create_flight("EasyJet", "LGW", "LGW", "U28549", "20/11/2021", "10:45", "2:25")
+
