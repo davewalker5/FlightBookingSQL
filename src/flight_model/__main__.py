@@ -1,5 +1,8 @@
 import datetime
 from random import randint
+
+import pytz
+
 from .model import create_database, Session, Airline, Airport, Flight, AircraftLayout, Passenger
 from .logic import apply_aircraft_layout
 from .data_exchange.airports import import_airport_details
@@ -27,18 +30,19 @@ def create_sample_flight(airline_name, embarkation_code, destination_code, numbe
     :param embarkation_code: 3-letter IATA code for the airport of embarkation
     :param destination_code: 3-letter IATA code for the destination airport
     :param number: Flight number
-    :param departure_date: Departure date and time
+    :param departure_date: Departure date and time in the embarkation timezone
     :param duration: Flight duration
     """
     with Session.begin() as session:
         airline = session.query(Airline).filter(Airline.name == airline_name).one()
         embarkation = session.query(Airport).filter(Airport.code == embarkation_code).one()
         destination = session.query(Airport).filter(Airport.code == destination_code).one()
+        utc_departure_date = pytz.timezone(embarkation.timezone).localize(departure_date).astimezone(pytz.UTC)
         flight = Flight(airline=airline,
                         embarkation_airport=embarkation,
                         destination_airport=destination,
                         number=number,
-                        departure_date=departure_date,
+                        departure_date=utc_departure_date,
                         duration=duration)
         session.add(flight)
 
@@ -137,7 +141,7 @@ def create_database_with_sample_data():
                          "LGW",
                          "RMU",
                          "U28549",
-                         datetime.datetime(2021, 11, 20, 10, 45, 0),
+                         datetime.datetime(2021, 8, 20, 10, 45, 0),
                          datetime.timedelta(hours=2, minutes=25))
 
     # Load an aircraft layout for the flight -> generates a set of seats
