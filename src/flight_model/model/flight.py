@@ -42,6 +42,16 @@ class Flight(Base):
     seats = relationship("Seat", back_populates="flight", cascade="all, delete, delete-orphan", lazy="joined")
 
     @property
+    def departs_utc(self):
+        """
+        Return the departure date as a timezone-aware UTC date and time (the date and time that's
+        read from the database is a UTC date and time but is not timezone-aware)
+
+        :return: The departure date and time as a UTC timezone-aware date and time
+        """
+        return pytz.UTC.localize(self.departure_date)
+
+    @property
     def departs_localtime(self):
         """
         Return the departure date and time converted to localtime for the point of embarkation
@@ -49,7 +59,7 @@ class Flight(Base):
         :return: The departure time converted to localtime for the point of embarkation
         """
         embarkation_timezone = pytz.timezone(self.embarkation_airport.timezone)
-        return self.departure_date.astimezone(embarkation_timezone)
+        return self.departs_utc.astimezone(embarkation_timezone)
 
     @property
     def arrives_localtime(self):
@@ -58,7 +68,7 @@ class Flight(Base):
 
         :return: The arrival date and time converted to localtime for the destination
         """
-        arrives_utc = self.departure_date + self.duration
+        arrives_utc = self.departs_utc + self.duration
         destination_timezone = pytz.timezone(self.destination_airport.timezone)
         return arrives_utc.astimezone(destination_timezone)
 

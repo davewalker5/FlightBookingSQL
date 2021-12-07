@@ -3,6 +3,8 @@ Flight business logic
 """
 
 import datetime
+
+import pytz
 import sqlalchemy as db
 from ..model import Session, Airline, Airport, Flight
 
@@ -51,13 +53,19 @@ def create_flight(airline_name, embarkation_code, destination_code, number, depa
     if embarkation_code == destination_code:
         raise ValueError("Embarkation and destination airports cannot be the same")
 
-    departure_date_and_time = _construct_date_and_time(departure_date, departure_time)
-    flight_duration = _construct_duration(duration)
-
     with Session.begin() as session:
         airline = session.query(Airline).filter(Airline.name == airline_name).one()
         embarkation = session.query(Airport).filter(Airport.code == embarkation_code).one()
         destination = session.query(Airport).filter(Airport.code == destination_code).one()
+        flight_duration = _construct_duration(duration)
+
+        # Construct the departure date and time as a naive datetime then localize them with the
+        # departure timezone (which is what it's assumed they're expressed in) and convert to UTC
+        departure_date_and_time_naive = _construct_date_and_time(departure_date, departure_time)
+        departure_date_and_time = pytz.timezone(embarkation.timezone)\
+            .localize(departure_date_and_time_naive)\
+            .astimezone(pytz.UTC)
+
         flight = Flight(airline=airline,
                         embarkation_airport=embarkation,
                         destination_airport=destination,
