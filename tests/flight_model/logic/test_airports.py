@@ -1,4 +1,5 @@
 import unittest
+from sqlalchemy.exc import IntegrityError
 from src.flight_model.model import create_database, Session, Airport
 from src.flight_model.logic import create_airport, list_airports
 
@@ -16,6 +17,10 @@ class TestAirports(unittest.TestCase):
             self.assertEqual("LGW", airport.code)
             self.assertEqual("London Gatwick", airport.name)
             self.assertEqual("Europe/London", airport.timezone)
+
+    def test_cannot_create_duplicate_code(self):
+        with self.assertRaises(ValueError), Session.begin() as session:
+            _ = create_airport("LGW", "Some Airport", "Europe/Madrid")
 
     def test_can_list_airports(self):
         airports = list_airports()
