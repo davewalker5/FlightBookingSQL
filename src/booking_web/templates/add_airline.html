@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Add Airline{% endblock %}
+
+{% block content %}
+    <h1>Add Airline</h1>
+    {% include "error.html" with context %}
+    <form method="post">
+        <div class="form-group">
+            <label>Name</label>
+            <input class="form-control" name="name" placeholder="Airline name" required>
+        </div>
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('list_all_airlines') }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">Add Airline</button>
+        </div>
+    </form>
+{% endblock %}

@@ -3,6 +3,7 @@ Airline business logic
 """
 
 import sqlalchemy as db
+from sqlalchemy.exc import IntegrityError
 from ..model import Session, Airline
 
 def create_airline(name):
@@ -12,9 +13,12 @@ def create_airline(name):
     :param name: Airline name
     :returns: An instance of the Airline class for the created record
     """
-    with Session.begin() as session:
-        airline = Airline(name=name)
-        session.add(airline)
+    try:
+        with Session.begin() as session:
+            airline = Airline(name=name)
+            session.add(airline)
+    except IntegrityError as e:
+        raise ValueError("Cannot create duplicate airline name") from e
 
     return airline
 

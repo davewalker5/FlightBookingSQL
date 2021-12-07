@@ -15,6 +15,10 @@ class TestAirlines(unittest.TestCase):
             airline = session.query(Airline).one()
             self.assertEqual("EasyJet", airline.name)
 
+    def test_cannot_create_duplicate_airline(self):
+        with self.assertRaises(ValueError), Session.begin() as session:
+            _ = create_airline("EasyJet")
+
     def test_can_list_airlines(self):
         airlines = list_airlines()
         self.assertEqual(1, len(airlines))
