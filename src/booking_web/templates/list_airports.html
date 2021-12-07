@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}Airports{% endblock %}
+
+{% block content %}
+    <h1>Airports</h1>
+    {% if airports | length > 0 %}
+        <table class="striped">
+            <thead>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Timezone</th>
+            </thead>
+            <tbody>
+                {% for airport in airports %}
+                    <tr>
+                        <td>{{ airport.code }}</td>
+                        <td>{{ airport.name }}</td>
+                        <td>{{ airport.timezone }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <span>There are no airports in the database</span>
+    {% endif %}
+    <div class="button-bar">
+        <button type="button" class="btn btn-primary">
+            <a href="{{ url_for('add_airport') }}">Add Airport</a>
+        </button>
+    </div>
+{% endblock %}

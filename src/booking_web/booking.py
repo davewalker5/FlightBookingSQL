@@ -7,9 +7,12 @@ to provide button and form element styling.
 """
 
 import datetime
+
+import pytz
 from flask import Flask, render_template, redirect, request, session
 from flight_model.logic import list_flights, create_flight, get_flight, delete_flight, add_passenger
-from flight_model.logic import list_airlines, list_airports
+from flight_model.logic import list_airlines
+from flight_model.logic import list_airports, create_airport
 from flight_model.logic import list_layouts, apply_aircraft_layout, allocate_seat
 from flight_model.logic import create_passenger, delete_passenger
 from flight_model.logic import generate_boarding_cards, InvalidOperationError, MissingBoardingCardPluginError
@@ -21,6 +24,10 @@ options_map = [
     {
         "description": "Create Flight",
         "view": "create_new_flight"
+    },
+    {
+        "description": "Airports",
+        "view": "list_all_airports"
     },
     {
         "description": "Home",
@@ -267,4 +274,39 @@ def print_boarding_cards(flight_id):
     else:
         return render_template("print_boarding_cards.html",
                                flight=get_flight(flight_id),
+                               error=None)
+
+
+@app.route("/list_airports")
+def list_all_airports():
+    """
+    Show the page that lists all airports and is the entry point for adding new ones
+
+    :return: The HTML for the airport listing page
+    """
+    return render_template("list_airports.html",
+                           options_map=options_map,
+                           airports=list_airports())
+
+
+@app.route("/add_airport", methods=["GET", "POST"])
+def add_airport():
+    """
+    Serve the page to add an airport and handle the addition when the form is submitted
+
+    :return: The HTML for the airport entry page or a response object redirecting to /
+    """
+    if request.method == "POST":
+        try:
+            _ = create_airport(request.form["code"], request.form["name"], request.form["timezone"])
+            return redirect("/list_airports")
+        except ValueError as e:
+            return render_template("add_airport.html",
+                                   options_map=options_map,
+                                   timezones=pytz.all_timezones,
+                                   error=e)
+    else:
+        return render_template("add_airport.html",
+                               options_map=options_map,
+                               timezones=pytz.all_timezones,
                                error=None)

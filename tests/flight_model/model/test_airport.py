@@ -24,5 +24,5 @@ class TestAirport(unittest.TestCase):
             _ = session.query(Airport).filter(Airport.code == "LGW").one()
 
     def test_cannot_add_airport_with_duplicate_code(self):
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValueError):
             create_test_airport("LGW", "Name", "TZ")

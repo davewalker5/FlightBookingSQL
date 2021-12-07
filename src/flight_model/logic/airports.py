@@ -3,6 +3,7 @@ Airport business logic
 """
 
 import sqlalchemy as db
+from sqlalchemy.exc import IntegrityError
 from ..model import Session, Airport
 
 
@@ -14,10 +15,14 @@ def create_airport(code, name, timezone):
     :param name: Airport name
     :param timezone: Airport timezone
     :returns: An instance of the Airport class for the created record
+    :raises ValueError: If the airport code is duplicated
     """
-    with Session.begin() as session:
-        airport = Airport(code=code, name=name, timezone=timezone)
-        session.add(airport)
+    try:
+        with Session.begin() as session:
+            airport = Airport(code=code, name=name, timezone=timezone)
+            session.add(airport)
+    except IntegrityError as e:
+        raise ValueError("Cannot create duplicate airport code") from e
 
     return airport
 
