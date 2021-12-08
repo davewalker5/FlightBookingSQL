@@ -22,6 +22,8 @@ CSV row would be:
 import csv
 import os
 import re
+from sqlalchemy.exc import IntegrityError
+from io import StringIO
 from ..model import get_data_path, Session, Airline, AircraftLayout, RowDefinition
 
 ROW_NUMBER_COLUMN = 0
@@ -44,7 +46,43 @@ def get_layout_file_path(airline, aircraft, layout=None):
     return os.path.join(get_data_path(), "sample_data", "layouts", file_name)
 
 
-def import_aircraft_layout(airline_name, aircraft, layout_name):
+def import_aircraft_layout_from_stream(airline_name, aircraft, layout_name, f):
+    """
+    Import an aircraft layout from a stream
+
+    :param airline_name: Name of the airline the layout belongs to
+    :param aircraft: Aircraft model name e.g. A320
+    :param layout_name: Name of the layout for the aircraft or None
+    :param f: IO stream (result of open() or a FileStorage object)
+    """
+    try:
+        with Session.begin() as session:
+            airline = session.query(Airline).filter(Airline.name == airline_name).one()
+            aircraft_layout = AircraftLayout(airline=airline, aircraft=aircraft, name=layout_name)
+            session.add(aircraft_layout)
+
+            # The data source could've been opened in binary or text mode, so read it all then decode it if necessary.
+            # Layout files are small so reading all their content into memory shouldn't be problematic
+            data = f.read()
+            csv_text = data if isinstance(data, str) else data.decode("UTF-8")
+
+            # Initialise a CSV reader over the string memory buffer and read and discard the header row
+            csv_io = StringIO(csv_text)
+            reader = csv.reader(csv_io)
+            _ = next(reader, None)
+
+            # The remaining rows contain the row definitions to be added to the aircraft layout
+            for row in reader:
+                row_definition = RowDefinition(number=row[ROW_NUMBER_COLUMN],
+                                               seating_class=row[CLASS_COLUMN],
+                                               seats=row[SEAT_LETTERS_COLUMN])
+                aircraft_layout.row_definitions.append(row_definition)
+                session.add(row_definition)
+    except IntegrityError as e:
+        raise ValueError("Duplicate layout or row definition detected")
+
+
+def import_aircraft_layout_from_file(airline_name, aircraft, layout_name):
     """
     Read and return an empty seating plan
 
@@ -52,22 +90,6 @@ def import_aircraft_layout(airline_name, aircraft, layout_name):
     :param aircraft: Aircraft model e.g. A320
     :param layout_name: Optional airline-specific layout name
     """
-    with Session.begin() as session:
-        airline = session.query(Airline).filter(Airline.name == airline_name).one()
-        aircraft_layout = AircraftLayout(airline=airline, aircraft=aircraft, name=layout_name)
-        session.add(aircraft_layout)
-
-        # Read the rows, throwing away the (mandatory) headers
-        file_path = get_layout_file_path(airline_name, aircraft, layout_name)
-        with open(file_path, mode="rt", encoding="utf-8") as f:
-            # Initialise the CSV reader and skip the headers
-            reader = csv.reader(f)
-            next(reader, None)
-
-            for row in reader:
-                # Create a row definition and add it to the model
-                row_definition = RowDefinition(number=row[ROW_NUMBER_COLUMN],
-                                               seating_class=row[CLASS_COLUMN],
-                                               seats=row[SEAT_LETTERS_COLUMN])
-                aircraft_layout.row_definitions.append(row_definition)
-                session.add(row_definition)
+    file_path = get_layout_file_path(airline_name, aircraft, layout_name)
+    with open(file_path, mode="rt", encoding="utf-8") as f:
+        import_aircraft_layout_from_stream(airline_name, aircraft, layout_name, f)

@@ -9,6 +9,7 @@ to provide button and form element styling.
 import datetime
 
 import pytz
+from sqlalchemy.exc import IntegrityError
 from flask import Flask, render_template, redirect, request, session
 from flight_model.logic import list_flights, create_flight, get_flight, delete_flight, add_passenger
 from flight_model.logic import list_airlines, create_airline
@@ -16,6 +17,7 @@ from flight_model.logic import list_airports, create_airport
 from flight_model.logic import list_layouts, apply_aircraft_layout, allocate_seat
 from flight_model.logic import create_passenger, delete_passenger
 from flight_model.logic import generate_boarding_cards, InvalidOperationError, MissingBoardingCardPluginError
+from flight_model.data_exchange import import_aircraft_layout_from_stream
 
 app = Flask("Flight Booking")
 app.secret_key = b'some secret key'
@@ -32,6 +34,10 @@ options_map = [
     {
         "description": "Airlines",
         "view": "list_all_airlines"
+    },
+    {
+        "description": "Aircraft Layouts",
+        "view": "list_all_layouts"
     },
     {
         "description": "Home",
@@ -328,7 +334,7 @@ def list_all_airlines():
                            airlines=list_airlines())
 
 
-@app.route("/v", methods=["GET", "POST"])
+@app.route("/add_airline", methods=["GET", "POST"])
 def add_airline():
     """
     Serve the page to add an airline and handle the addition when the form is submitted
@@ -346,4 +352,42 @@ def add_airline():
     else:
         return render_template("add_airline.html",
                                options_map=options_map,
+                               error=None)
+
+
+@app.route("/list_layouts")
+def list_all_layouts():
+    """
+    Show the page that lists all airlines and is the entry point for adding new ones
+
+    :return: The HTML for the airline listing page
+    """
+    return render_template("list_layouts.html",
+                           options_map=options_map,
+                           layouts=list_layouts(None))
+
+
+@app.route("/add_layout", methods=["GET", "POST"])
+def add_layout():
+    """
+    Serve the page to add an aircraft layout and handle the addition when the form is submitted
+
+    :return: The HTML for the aircraft layout upload page or a response object redirecting to the layout list page
+    """
+    if request.method == "POST":
+        try:
+            import_aircraft_layout_from_stream(request.form["airline"],
+                                               request.form["aircraft"],
+                                               request.form["layout_name"],
+                                               request.files["csv_file_name"])
+            return redirect("/list_layouts")
+        except ValueError as e:
+            return render_template("add_layout.html",
+                                   options_map=options_map,
+                                   airlines=list_airlines(),
+                                   error=e)
+    else:
+        return render_template("add_layout.html",
+                               options_map=options_map,
+                               airlines=list_airlines(),
                                error=None)

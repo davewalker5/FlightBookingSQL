@@ -2,22 +2,32 @@
 Aircraft layout and seat allocation business logic
 """
 
+import sqlalchemy as db
 from sqlalchemy.orm import joinedload
-from ..model import Session, AircraftLayout, Flight, Seat, Passenger
+from ..model import Session, AircraftLayout, Flight, Seat, RowDefinition
 
 
 def list_layouts(airline_id):
     """
     List of aircraft layouts for an airline
 
-    :param airline_id: ID of the airline for which to load aircraft layouts
+    :param airline_id: ID of the airline for which to load aircraft layouts (or None to list all layouts)
     :return: A list of Aircraft layout instances with eager loading of related entities
     """
     with Session.begin() as session:
-        layouts = session.query(AircraftLayout) \
-            .options(joinedload(AircraftLayout.airline))\
-            .filter(AircraftLayout.airline_id == airline_id)\
-            .all()
+        if airline_id:
+            layouts = session.query(AircraftLayout) \
+                .options(joinedload(AircraftLayout.airline)) \
+                .filter(AircraftLayout.airline_id == airline_id) \
+                .order_by(db.asc(AircraftLayout.aircraft),
+                          db.asc(AircraftLayout.name)) \
+                .all()
+        else:
+            layouts = session.query(AircraftLayout) \
+                .options(joinedload(AircraftLayout.airline)) \
+                .order_by(db.asc(AircraftLayout.aircraft),
+                          db.asc(AircraftLayout.name)) \
+                .all()
 
     return layouts
 
@@ -181,3 +191,40 @@ def allocate_seat(flight_id, passenger_id, seat_number):
             current_seat[0].passenger_id = None
 
         required_seat[0].passenger_id = passenger_id
+
+
+def create_layout(airline_id, aircraft_model, layout_name):
+    """
+    Create a new aircraft layout with the specified properties
+
+    :param airline_id: ID for the airline associated with the layout
+    :param aircraft_model: Aircraft model e.g. A321
+    :param layout_name: Layout name e.g. Neo
+    """
+    with Session.begin() as session:
+        aircraft_layout = AircraftLayout(airline_id=airline_id,
+                                         aircraft=aircraft_model,
+                                         name=layout_name)
+        session.add(aircraft_layout)
+
+    return aircraft_layout
+
+
+def add_row_to_layout(aircraft_layout_id, row_number, seating_class, seat_letters):
+    """
+    Add a row definition to an existing aircraft layout
+
+    :param aircraft_layout_id: ID for the aircraft layout to add to
+    :param row_number: Row number
+    :param seating_class: Seating class for the row
+    :param seat_letters: String of seat letters for the row e.g. ABCDEF
+    """
+    with Session.begin() as session:
+        row_definition = RowDefinition(aircraft_layout_id=aircraft_layout_id,
+                                       number=row_number,
+                                       seating_class=seating_class,
+                                       seats=seat_letters)
+        session.add(row_definition)
+
+    return row_definition
+

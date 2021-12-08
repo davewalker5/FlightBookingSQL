@@ -48,6 +48,7 @@ class RowDefinition(Base):
     Row definition for an aircraft layout, giving the row number and the seat letters in that row
     """
     __tablename__ = "ROW_DEFINITIONS"
+    __table_args__ = (UniqueConstraint('aircraft_layout_id', 'number', name='AIRLINE_AIRCRAFT_LAYOUT_UX'),)
 
     #: Primary key
     id = Column(Integer, primary_key=True)
