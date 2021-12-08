@@ -7,7 +7,7 @@ from .model import create_database, Session, Airline, Airport, Flight, AircraftL
 from .logic import apply_aircraft_layout
 from .data_exchange.airports import import_airport_details
 from .data_exchange.airlines import import_airline_details
-from .data_exchange.aircraft_layouts import import_aircraft_layout
+from .data_exchange.aircraft_layouts import import_aircraft_layout_from_file
 
 
 def import_reference_data():
@@ -16,9 +16,9 @@ def import_reference_data():
     """
     import_airport_details()
     import_airline_details()
-    import_aircraft_layout("EasyJet", "A320", None)
-    import_aircraft_layout("EasyJet", "A320", "1")
-    import_aircraft_layout("EasyJet", "A321", "neo")
+    import_aircraft_layout_from_file("EasyJet", "A320", None)
+    import_aircraft_layout_from_file("EasyJet", "A320", "1")
+    import_aircraft_layout_from_file("EasyJet", "A321", "neo")
 
 
 def create_sample_flight(airline_name, embarkation_code, destination_code, number, departure_date, duration):

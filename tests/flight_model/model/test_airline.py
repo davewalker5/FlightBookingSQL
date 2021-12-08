@@ -22,5 +22,5 @@ class TestAirline(unittest.TestCase):
             _ = session.query(Airline).filter(Airline.name == "EasyJet").one()
 
     def test_cannot_add_airline_with_duplicate_name(self):
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValueError):
             create_test_airline(name="EasyJet")

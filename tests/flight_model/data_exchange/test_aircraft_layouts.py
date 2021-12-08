@@ -1,6 +1,6 @@
 import unittest
 from src.flight_model.model import create_database, Session, AircraftLayout
-from src.flight_model.data_exchange import import_aircraft_layout
+from src.flight_model.data_exchange import import_aircraft_layout_from_file
 from tests.flight_model.utils import create_test_airline
 
 
@@ -10,7 +10,7 @@ class TestAircraftLayouts(unittest.TestCase):
         create_test_airline("EasyJet")
 
     def test_import_layout(self):
-        import_aircraft_layout("EasyJet", "A320", None)
+        import_aircraft_layout_from_file("EasyJet", "A320", None)
         with Session.begin() as session:
             aircraft_layout = session.query(AircraftLayout).one()
 

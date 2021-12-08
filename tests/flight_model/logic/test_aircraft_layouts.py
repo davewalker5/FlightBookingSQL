@@ -1,31 +1,49 @@
 import datetime
 import unittest
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from src.flight_model.model import create_database, Session, Flight, AircraftLayout, Seat, Airline
-from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts
-from tests.flight_model.utils import create_test_airline, create_test_flight, create_test_layout, \
+from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts, create_airline, create_layout, \
+    add_row_to_layout
+from tests.flight_model.utils import create_test_flight, create_test_layout, \
     create_test_airport, create_test_passengers_on_flight
 
 
 class TestAircraftLayouts(unittest.TestCase):
     def setUp(self) -> None:
         create_database()
-        create_test_airline("EasyJet")
-        create_test_airline("British Airways")
-        create_test_layout("EasyJet", "A321", "Neo", 10, "ABC")
-        create_test_layout("EasyJet", "A320", "1", 1, "ABCDEF")
-        create_test_layout("British Airways", "A320", "", 1, "ABCDEF")
+
+        easyjet = create_airline("EasyJet")
+        layout = create_layout(easyjet.id, "A321", "Neo")
+        for row in range(1, 11):
+            _ = add_row_to_layout(layout.id, row, "Economy", "ABC")
+
+        layout = create_layout(easyjet.id, "A320", "1")
+        _ = add_row_to_layout(layout.id, 1, "Economy", "ABCDEF")
+
+        ba = create_airline("British Airways")
+        layout = create_layout(ba.id, "A320", "")
+        _ = add_row_to_layout(layout.id, 1, "Economy", "ABCDEF")
+
         create_test_airport("LGW", "London Gatwick", "Europe/London")
         create_test_airport("RMU", "Murcia International Airport", "Europe/Madrid")
         create_test_flight("EasyJet", "LGW", "RMU", "U28549", datetime.datetime(2021, 11, 20, 10, 45, 0),
                            datetime.timedelta(hours=2, minutes=25))
 
-    def test_can_list_layouts(self):
+    def test_can_list_layouts_for_airline(self):
         with Session.begin() as session:
             airline_id = session.query(Airline).filter(Airline.name == "EasyJet").one().id
 
         layouts = list_layouts(airline_id)
+        unique_airline_ids = set([layout.airline_id for layout in layouts])
         self.assertEqual(2, len(layouts))
+        self.assertEqual(1, len(unique_airline_ids))
+
+    def test_can_list_layouts_for_all_airlines(self):
+        layouts = list_layouts(None)
+        unique_airline_ids = set([layout.airline_id for layout in layouts])
+        self.assertEqual(3, len(layouts))
+        self.assertEqual(2, len(unique_airline_ids))
 
     def test_can_apply_aircraft_layout(self):
         # Get the flight that the seating plan will be associated with and find the aircraft layout
@@ -275,3 +293,12 @@ class TestAircraftLayouts(unittest.TestCase):
 
             seat = session.query(Seat).filter(Seat.seat_number == "1B").one()
             self.assertIsNotNone(seat.passenger_id)
+
+    def test_cannot_add_duplicate_layout(self):
+        with self.assertRaises(IntegrityError):
+            create_test_layout("EasyJet", "A321", "Neo", 10, "ABCDEF")
+
+    def test_cannot_add_duplicate_row(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            layout = session.query(AircraftLayout).first()
+            _ = add_row_to_layout(layout.id, 1, "Economy", "ABCDEF")

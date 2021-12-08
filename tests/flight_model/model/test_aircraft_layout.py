@@ -12,10 +12,7 @@ class TestAircraftLayout(unittest.TestCase):
 
     def test_can_add_layout(self):
         with Session.begin() as session:
-            aircraft_layout = session.query(AircraftLayout)\
-                .filter(AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
+            aircraft_layout = session.query(AircraftLayout).one()
 
             self.assertEqual("EasyJet", aircraft_layout.airline.name)
             self.assertEqual("A321", aircraft_layout.aircraft)
@@ -31,10 +28,7 @@ class TestAircraftLayout(unittest.TestCase):
         with Session.begin() as session:
             # Note that delete won't cascade if we use delete() on the query object. Get the
             # layout object and delete it to cause the cascade that will delete row definitions
-            aircraft_layout = session.query(AircraftLayout)\
-                .filter(AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
+            aircraft_layout = session.query(AircraftLayout).one()
             session.delete(aircraft_layout)
 
         with self.assertRaises(NoResultFound), Session.begin() as session:
@@ -72,3 +66,12 @@ class TestAircraftLayout(unittest.TestCase):
     def test_cannot_add_duplicate_layout(self):
         with self.assertRaises(IntegrityError):
             create_test_layout("EasyJet", "A321", "Neo", 10, "ABCDEF")
+
+    def test_cannot_add_duplicate_row(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
+                                           number=1,
+                                           seating_class="Economy",
+                                           seats="ABCDEF")
+            session.add(row_definition)
