@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block title %}Create Flight{% endblock %}
+
+{% block content %}
+    {% include "error.html" with context %}
+    <form method="post">
+        <div class="form-group">
+            <label>Airline</label>
+            <select name="airline" class="form-control" required>
+                <option value="">Please select ...</option>
+                {% for airline in airlines %}
+                    <!-- TODO : Should really use the airline ID as the value here -->
+                    <option value="{{ airline.name }}">{{ airline.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Flight number</label>
+            <input class="form-control" name="number" placeholder="Flight number" required>
+        </div>
+        <div class="form-group">
+            <label>Embarkation airport</label>
+            <select name="embarkation" class="form-control" required>
+                <option value="">Please select ...</option>
+                {% for airport in airports %}
+                    <option value="{{ airport.code }}">{{ airport.code }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Destination airport</label>
+            <select name="destination" class="form-control" required>
+                <option value="">Please select ...</option>
+                {% for airport in airports %}
+                    <option value="{{ airport.code }}">{{ airport.code }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Departure date</label>
+            <input class="form-control" name="departure_date" pattern="[\d]{2}\/[\d]{2}\/[\d]{4}"
+                   placeholder="Departure date DD/MM/YYYY" required>
+        </div>
+        <div class="form-group">
+            <label>Departure time</label>
+            <input class="form-control" name="departure_time" pattern="[\d]{2}:[\d]{2}"
+                   placeholder="Departure time HH:MM" required>
+        </div>
+        <div class="form-group">
+            <label>Flight duration</label>
+            <input class="form-control" name="duration" pattern="[\d]{1,2}:[\d]{2}"
+                   placeholder="Flight duration HH:MM" required>
+        </div>
+
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('flights.list_all') }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">Create Flight</button>
+        </div>
+    </form>
+{% endblock %}

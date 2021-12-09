@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Delete Passenger{% endblock %}
+
+{% block content %}
+    <h1>Delete Passenger</h1>
+
+    {% include "passengers/passengers.html" with context %}
+
+    <h2>Please confirm you want to delete this passenger from flight {{ flight.number }}:</h2>
+    <form method="post">
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('passengers.list_all', flight_id=flight.id ) }}">Cancel</a>
+            </button>
+            <button type="submit" value="delete" class="btn btn-primary">Confirm</button>
+        </div>
+    </form>
+{% endblock %}

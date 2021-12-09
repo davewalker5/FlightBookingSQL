@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Airlines{% endblock %}
+
+{% block content %}
+    <h1>Airlines</h1>
+    {% if airlines | length > 0 %}
+        {% include "airlines/airlines.html" with context %}
+    {% else %}
+        <span>There are no airlines in the database</span>
+    {% endif %}
+    <div class="button-bar">
+        <button type="button" class="btn btn-primary">
+            <a href="{{ url_for('airlines.add') }}">Add Airline</a>
+        </button>
+    </div>
+{% endblock %}

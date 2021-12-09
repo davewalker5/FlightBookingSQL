@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}Aircraft Layouts{% endblock %}
+
+{% block content %}
+    <h1>Aircraft Layouts</h1>
+    {% if layouts | length > 0 %}
+        <table class="striped">
+            <thead>
+                <th>Airline</th>
+                <th>Aircraft</th>
+                <th>Layout</th>
+            </thead>
+            <tbody>
+                {% for layout in layouts %}
+                    <tr>
+                        <td>{{ layout.airline.name }}</td>
+                        <td>{{ layout.aircraft }}</td>
+                        <td>{{ layout.name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <span>There are no layouts in the database</span>
+    {% endif %}
+    <div class="button-bar">
+        <button type="button" class="btn btn-primary">
+            <a href="{{ url_for('layouts.add') }}">Add Layout</a>
+        </button>
+    </div>
+{% endblock %}

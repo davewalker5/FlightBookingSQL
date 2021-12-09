@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}Add Aircraft Layout{% endblock %}
+
+{% block content %}
+    <h1>Add Aircraft Layout</h1>
+    {% include "error.html" with context %}
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Airline</label>
+            <select name="airline" class="form-control" required>
+                <option value="">Please select ...</option>
+                {% for airline in airlines %}
+                    <option value="{{ airline.name }}">{{ airline.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Aircraft Model</label>
+            <input class="form-control" name="aircraft" placeholder="Aircraft model e.g. A321" required>
+        </div>
+        <div class="form-group">
+            <label>Layout Name</label>
+            <input class="form-control" name="layout_name" placeholder="Aircraft layout name e.g. neo">
+        </div>
+        <div class="form-group">
+            <label>Layout File</label>
+            <input class="form-control" type="file" name="csv_file_name" required>
+        </div>
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('layouts.list_all') }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">Add Aircraft Layout</button>
+        </div>
+    </form>
+{% endblock %}

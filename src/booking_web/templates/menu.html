@@ -1,13 +1,11 @@
  <strong>
     <nav>
         <ul class="menu">
-            {% for option in options_map %}
-                <li>
-                    <a href="{{ url_for(options_map[loop.index0]['view']) }}">
-                        {{ options_map[loop.index0]["description"] }}
-                    </a>
-                </li>
-            {% endfor %}
+            <li><a href="{{ url_for('flights.add') }}">Create Flight</a></li>
+            <li><a href="{{ url_for('airports.list_all') }}">Airports</a></li>
+            <li><a href="{{ url_for('airlines.list_all') }}">Airlines</a></li>
+            <li><a href="{{ url_for('layouts.list_all') }}">Aircraft Layouts</a></li>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
         </ul>
     </nav>
 </strong>

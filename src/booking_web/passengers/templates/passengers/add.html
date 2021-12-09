@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block title %}Add Passenger - {{ flight.number }} {% endblock %}
+
+{% block content %}
+    <h1>Add Passenger - {{ flight.number }}</h1>
+    {% include "error.html" with context %}
+    <form method="post">
+        <div class="form-group">
+            <label>Name</label>
+            <input class="form-control" name="name" placeholder="Full passenger name" required>
+        </div>
+        <div class="form-group">
+            <label>Gender</label>
+            <select name="gender" class="form-control" required>
+                <option value="">Please select ...</option>
+                <option value="M">M</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Date of birth</label>
+            <input class="form-control" name="dob" pattern="[\d]{2}\/[\d]{2}\/[\d]{4}"
+                   placeholder="Date of birth DD/MM/YYYY" required>
+        </div>
+        <div class="form-group">
+            <label>Nationality</label>
+            <input class="form-control" name="nationality" placeholder="Passenger's nationality" required>
+        </div>
+        <div class="form-group">
+            <label>Residency</label>
+            <input class="form-control" name="residency" placeholder="Passenger's country of residence" required>
+        </div>
+        <div class="form-group">
+            <label>Passport number</label>
+            <input class="form-control" name="passport_number" placeholder="Passport number" required>
+        </div>
+
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('passengers.list_all', flight_id=flight.id) }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">Add Passenger</button>
+        </div>
+    </form>
+{% endblock %}
