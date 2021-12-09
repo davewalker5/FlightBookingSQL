@@ -9,11 +9,10 @@ to provide button and form element styling.
 import datetime
 
 import pytz
-from sqlalchemy.exc import IntegrityError
 from flask import Flask, render_template, redirect, request, session
 from flight_model.logic import list_flights, create_flight, get_flight, delete_flight, add_passenger
 from flight_model.logic import list_airlines, create_airline
-from flight_model.logic import list_airports, create_airport
+from flight_model.logic import list_airports, create_airport, get_airport, delete_airport
 from flight_model.logic import list_layouts, apply_aircraft_layout, allocate_seat
 from flight_model.logic import create_passenger, delete_passenger
 from flight_model.logic import generate_boarding_cards, InvalidOperationError, MissingBoardingCardPluginError
@@ -296,7 +295,8 @@ def list_all_airports():
     """
     return render_template("list_airports.html",
                            options_map=options_map,
-                           airports=list_airports())
+                           airports=list_airports(),
+                           edit_enabled=True)
 
 
 @app.route("/add_airport", methods=["GET", "POST"])
@@ -320,6 +320,32 @@ def add_airport():
                                options_map=options_map,
                                timezones=pytz.all_timezones,
                                error=None)
+
+
+@app.route("/delete_airport_by_id/<int:airport_id>", methods=["GET", "POST"])
+def delete_airport_by_id(airport_id):
+    """
+    Serve the page to confirm deletion of an airport and handle the deletion when the form is submitted
+
+    :param airport_id: ID for the airport to delete
+    :return: The rendered airport deletion template or a redirect to the airport list page
+    """
+    if request.method == "POST":
+        try:
+            delete_airport(airport_id)
+            return redirect(f"/list_airports")
+        except ValueError as e:
+            return render_template("delete_airport.html",
+                                   options_map=options_map,
+                                   airports=[get_airport(airport_id)],
+                                   error=e,
+                                   edit_enabled=False)
+    else:
+        return render_template("delete_airport.html",
+                               options_map=options_map,
+                               airports=[get_airport(airport_id)],
+                               error=None,
+                               edit_enabled=False)
 
 
 @app.route("/list_airlines")

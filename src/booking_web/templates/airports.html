@@ -1,0 +1,28 @@
+{% if airports | length > 0 %}
+    <table class="striped">
+        <thead>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Timezone</th>
+            {% if edit_enabled %}
+                <th></th>
+            {% endif %}
+        </thead>
+        <tbody>
+            {% for airport in airports %}
+                <tr>
+                    <td>{{ airport.code }}</td>
+                    <td>{{ airport.name }}</td>
+                    <td>{{ airport.timezone }}</td>
+                    {% if edit_enabled %}
+                        <td>
+                            <a href="{{ url_for('delete_airport_by_id', airport_id=airport.id) }}">
+                                <i class="fa fa-trash" title="Delete Airport"></i>
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
