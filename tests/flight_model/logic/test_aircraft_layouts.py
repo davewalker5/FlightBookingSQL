@@ -1,12 +1,13 @@
-import datetime
 import unittest
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from src.flight_model.model import create_database, Session, Flight, AircraftLayout, Seat, Airline
-from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts, create_airline, create_layout, \
+from src.flight_model.logic import create_airport
+from src.flight_model.logic import create_airline
+from src.flight_model.logic import create_flight
+from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts, create_layout, \
     add_row_to_layout
-from tests.flight_model.utils import create_test_flight, create_test_layout, \
-    create_test_airport, create_test_passengers_on_flight
+from tests.flight_model.utils import create_test_layout, create_test_passengers_on_flight
 
 
 class TestAircraftLayouts(unittest.TestCase):
@@ -25,10 +26,9 @@ class TestAircraftLayouts(unittest.TestCase):
         layout = create_layout(ba.id, "A320", "")
         _ = add_row_to_layout(layout.id, 1, "Economy", "ABCDEF")
 
-        create_test_airport("LGW", "London Gatwick", "Europe/London")
-        create_test_airport("RMU", "Murcia International Airport", "Europe/Madrid")
-        create_test_flight("EasyJet", "LGW", "RMU", "U28549", datetime.datetime(2021, 11, 20, 10, 45, 0),
-                           datetime.timedelta(hours=2, minutes=25))
+        create_airport("LGW", "London Gatwick", "Europe/London")
+        create_airport("RMU", "Murcia International Airport", "Europe/Madrid")
+        create_flight("EasyJet", "LGW", "RMU", "U28549", "20/11/2021", "10:45", "2:25")
 
     def test_can_list_layouts_for_airline(self):
         with Session.begin() as session:

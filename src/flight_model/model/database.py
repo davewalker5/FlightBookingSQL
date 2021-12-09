@@ -56,5 +56,27 @@ def create_database():
     Base.metadata.create_all(engine)
 
 
+#: Instance of the SQLAlchemy database engine
 Engine = _create_engine()
+
+#: Session class for the engine, used  to create session instances
 Session = sessionmaker(Engine, expire_on_commit=False)
+
+
+@db.event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, _):
+    """
+    Intercept connection events for the database engine and ensure foreign keys are enabled. From the SQLAlchemy
+    SQLite documentation:
+
+    "SQLite supports FOREIGN KEY syntax when emitting CREATE statements for tables, however by default these
+    constraints have no effect on the operation of the table" and, aside from pre-requisites concerning the SQLite
+    version and how it's been compiled, "The PRAGMA foreign_keys = ON statement must be emitted on all connections
+    before use – including the initial call to MetaData.create_all()"
+
+    :param dbapi_connection:
+    :param _:
+    """
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()

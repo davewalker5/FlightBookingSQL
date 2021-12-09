@@ -7,8 +7,6 @@ from src.flight_model.logic import create_airport, list_airports
 class TestAirports(unittest.TestCase):
     def setUp(self) -> None:
         create_database()
-
-        # Use the production logic, here, as this is one of the methods under test
         create_airport("LGW", "London Gatwick", "Europe/London")
 
     def test_can_create_airport(self):

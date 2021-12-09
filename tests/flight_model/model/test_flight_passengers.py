@@ -1,24 +1,20 @@
 import unittest
 import datetime
 from src.flight_model.model import create_database, Session, Flight, Passenger
-from tests.flight_model.utils import create_test_airport, create_test_airline, create_test_flight, \
-    create_test_passenger
+from src.flight_model.logic import create_airport
+from src.flight_model.logic import create_airline
+from src.flight_model.logic import create_flight
+from src.flight_model.logic import create_passenger
 
 
 class TestFlight(unittest.TestCase):
     def setUp(self) -> None:
         create_database()
-        create_test_airline("EasyJet")
-        create_test_airport("LGW", "London Gatwick", "Europe/London")
-        create_test_airport("RMU", "Murcia International Airport", "Europe/Madrid")
-        create_test_flight("EasyJet", "LGW", "RMU", "U28549", datetime.datetime(2021, 11, 20, 10, 45, 0),
-                           datetime.timedelta(hours=2, minutes=25))
-        create_test_passenger("Some Passenger",
-                              "M",
-                              datetime.date(1970, 2, 1),
-                              "United Kingdom",
-                              "England",
-                              "1234567890")
+        create_airline("EasyJet")
+        create_airport("LGW", "London Gatwick", "Europe/London")
+        create_airport("RMU", "Murcia International Airport", "Europe/Madrid")
+        create_flight("EasyJet", "LGW", "RMU", "U28549", "20/11/2021", "10:45", "2:25")
+        create_passenger("Some Passenger", "M", datetime.date(1970, 2, 1), "United Kingdom", "England", "1234567890")
 
         # Add the test passenger to the test flight
         with Session.begin() as session:

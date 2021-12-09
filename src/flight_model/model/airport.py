@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, UniqueConstraint
 from .base import Base
 
 
@@ -7,6 +7,7 @@ class Airport(Base):
     Class representing an airport
     """
     __tablename__ = "AIRPORTS"
+    __table_args__ = (UniqueConstraint('code', name='AIRPORT_CODE_UX'),)
 
     #: Primary key
     id = Column(Integer, primary_key=True)
