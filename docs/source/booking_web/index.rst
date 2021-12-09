@@ -6,3 +6,9 @@ The booking_web Package
    :caption: Contents:
 
    booking
+   airlines_blueprint
+   airports_blueprint
+   boarding_cards_blueprint
+   flights_blueprint
+   layouts_blueprint
+   passengers_blueprint

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Passenger List - {{ flight.number }}{% endblock %}
+
+{% block content %}
+    <h1>Passenger List - {{ flight.number }}</h1>
+    {% include "passengers/passengers.html" with context %}
+
+    <div class="button-bar">
+        <button type="button" class="btn btn-primary">
+            <a href="{{ url_for('passengers.add', flight_id=flight.id ) }}">Add Passenger</a>
+        </button>
+    </div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% if flights | length > 0 %}
+    <table class="striped">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Airline</th>
+                <th>Departs</th>
+                <th>To</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Duration</th>
+                <th>Arrival Date</th>
+                <th>Arrival Time</th>
+                <th>Passengers</th>
+                <th>Capacity</th>
+                <th>Available</th>
+                {% if edit_enabled %}
+                    <th/>
+                    <th/>
+                    <th/>
+                    <th/>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for flight in flights %}
+                <tr class={{ "row-even" if loop.index %2 == 0 else "row-odd" }}>
+                    <td>{{ flight.number }}</td>
+                    <td>{{ flight.airline.name }}</td>
+                    <td>
+                        {{ flight.embarkation_airport.code }}
+                    </td>
+                    <td>
+                        {{ flight.destination_airport.code }}
+                    </td>
+                    <td>
+                        {{ flight.departs_localtime.strftime("%d/%m/%Y") }}
+                    </td>
+                    <td>
+                        {{ flight.departs_localtime.strftime("%H:%M") }}
+                    </td>
+                    <td>
+                        {{ flight.formatted_duration }}
+                    </td>
+                    <td>
+                        {{ flight.arrives_localtime.strftime("%d/%m/%Y") }}
+                    </td>
+                    <td>
+                        {{ flight.arrives_localtime.strftime("%H:%M") }}
+                    </td>
+                    <td>
+                        {{ flight.passengers | length }}
+                    </td>
+                    <td>
+                        {{ flight.capacity }}
+                    </td>
+                    <td>
+                        {{ flight.available_capacity }}
+                    </td>
+                    {% if edit_enabled %}
+                        <td>
+                            <a href="{{ url_for('layouts.select', flight_id=flight.id) }}">
+                                <i class="fas fa-plane" title="Aircraft Layout"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('passengers.list_all', flight_id=flight.id) }}">
+                                <i class="fa fa-user" title="Passengers"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('boarding_cards.print_cards', flight_id=flight.id) }}">
+                                <i class="fa fa-id-card" title="Generate Boarding Cards"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('flights.delete', flight_id=flight.id) }}">
+                                <i class="fa fa-trash" title="Delete Flight"></i>
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

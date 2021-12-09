@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Allocate Seat - {{ flight.number }}{% endblock %}
+
+{% block content %}
+    <h1>Allocate Seat</h1>
+
+    {% include "error.html" with context %}
+    {% include "passengers/passengers.html" with context %}
+
+    <form method="post">
+        <div class="form-group">
+            <label>Seat number</label>
+            <input class="form-control" name="seat_number" placeholder="Seat number e.g. 15C" required>
+        </div>
+
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('passengers.list_all', flight_id=flight.id) }}">Cancel</a>
+            </button>
+            <button type="submit" value="allocate" class="btn btn-primary">Allocate Seat</button>
+        </div>
+    </form>
+{% endblock %}
