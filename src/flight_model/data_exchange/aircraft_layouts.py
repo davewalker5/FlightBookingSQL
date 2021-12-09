@@ -58,7 +58,9 @@ def import_aircraft_layout_from_stream(airline_name, aircraft, layout_name, f):
     try:
         with Session.begin() as session:
             airline = session.query(Airline).filter(Airline.name == airline_name).one()
-            aircraft_layout = AircraftLayout(airline=airline, aircraft=aircraft, name=layout_name)
+            aircraft_layout = AircraftLayout(airline=airline,
+                                             aircraft=aircraft,
+                                             name="" if layout_name is None else layout_name)
             session.add(aircraft_layout)
 
             # The data source could've been opened in binary or text mode, so read it all then decode it if necessary.
@@ -79,7 +81,7 @@ def import_aircraft_layout_from_stream(airline_name, aircraft, layout_name, f):
                 aircraft_layout.row_definitions.append(row_definition)
                 session.add(row_definition)
     except IntegrityError as e:
-        raise ValueError("Duplicate layout or row definition detected")
+        raise ValueError("Duplicate layout or row definition detected") from e
 
 
 def import_aircraft_layout_from_file(airline_name, aircraft, layout_name):

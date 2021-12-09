@@ -1,13 +1,16 @@
 import unittest
 from sqlalchemy.exc import NoResultFound, IntegrityError
 from src.flight_model.model import create_database, Session, Airline, AircraftLayout, RowDefinition
-from tests.flight_model.utils import create_test_airline, create_test_layout
+from src.flight_model.logic import create_airline
+from src.flight_model.logic import create_airport
+from src.flight_model.logic import create_flight
+from tests.flight_model.utils import create_test_layout, create_test_seating_plan
 
 
 class TestAircraftLayout(unittest.TestCase):
     def setUp(self) -> None:
         create_database()
-        create_test_airline("EasyJet")
+        create_airline("EasyJet")
         create_test_layout("EasyJet", "A321", "Neo", 10, "ABCDEF")
 
     def test_can_add_layout(self):
@@ -37,6 +40,15 @@ class TestAircraftLayout(unittest.TestCase):
         with self.assertRaises(NoResultFound), Session.begin() as session:
             session.query(RowDefinition).one()
 
+    def test_cannot_delete_layout_in_use(self):
+        create_airport("LGW", "London Gatwick", "Europe/London")
+        create_airport("RMU", "Murcia International Airport", "Europe/Madrid")
+        create_flight("EasyJet", "LGW", "RMU", "U28549", "20/11/2021", "10:45", "2:25")
+        create_test_seating_plan("U28549", "A321", "Neo")
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            session.delete(aircraft_layout)
+
     def test_related_layouts_returned_with_airline(self):
         with Session.begin() as session:
             airline = session.query(Airline).filter(Airline.name == "EasyJet").one()
@@ -56,7 +68,7 @@ class TestAircraftLayout(unittest.TestCase):
             session.query(RowDefinition).one()
 
     def test_can_add_same_layout_for_different_airline(self):
-        create_test_airline("British Airways")
+        create_airline("British Airways")
         create_test_layout("British Airways", "A321", "Neo", 10, "ABCDEF")
 
         with Session.begin() as session:

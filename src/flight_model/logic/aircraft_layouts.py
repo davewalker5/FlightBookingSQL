@@ -204,7 +204,7 @@ def create_layout(airline_id, aircraft_model, layout_name):
     with Session.begin() as session:
         aircraft_layout = AircraftLayout(airline_id=airline_id,
                                          aircraft=aircraft_model,
-                                         name=layout_name)
+                                         name="" if layout_name is None else layout_name)
         session.add(aircraft_layout)
 
     return aircraft_layout
@@ -227,4 +227,3 @@ def add_row_to_layout(aircraft_layout_id, row_number, seating_class, seat_letter
         session.add(row_definition)
 
     return row_definition
-

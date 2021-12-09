@@ -1,18 +1,18 @@
 import datetime
 import unittest
 from src.flight_model.model import create_database, Session, Flight
-from src.flight_model.logic import create_flight, get_flight, list_flights, delete_flight, add_passenger
-from tests.flight_model.utils import create_test_airline, create_test_airport, create_test_passenger
+from src.flight_model.logic import create_flight, get_flight, list_flights, delete_flight
+from src.flight_model.logic import create_airport
+from src.flight_model.logic import create_airline
+from src.flight_model.logic import create_passenger, add_passenger
 
 
 class TestFlights(unittest.TestCase):
     def setUp(self) -> None:
         create_database()
-        create_test_airline("EasyJet")
-        create_test_airport("LGW", "London Gatwick", "Europe/London")
-        create_test_airport("RMU", "Murcia International Airport", "Europe/Madrid")
-
-        # Use the production logic, here, as this is one of the methods under test
+        create_airline("EasyJet")
+        create_airport("LGW", "London Gatwick", "Europe/London")
+        create_airport("RMU", "Murcia International Airport", "Europe/Madrid")
         create_flight("EasyJet", "LGW", "RMU", "U28549", "20/11/2021", "10:45", "2:25")
 
     def test_can_create_flight(self):
@@ -54,8 +54,7 @@ class TestFlights(unittest.TestCase):
         with Session.begin() as session:
             flight_id = session.query(Flight).one().id
 
-        passenger = create_test_passenger("Some One", "F", datetime.datetime(1970, 2, 1).date(), "UK", "UK",
-                                          "123456789")
+        passenger = create_passenger("Some One", "F", datetime.datetime(1970, 2, 1).date(), "UK", "UK", "123456789")
         add_passenger(flight_id, passenger)
 
         flight = get_flight(flight_id)
@@ -64,4 +63,3 @@ class TestFlights(unittest.TestCase):
     def test_cannot_add_flight_with_same_departure_and_destination(self):
         with self.assertRaises(ValueError):
             create_flight("EasyJet", "LGW", "LGW", "U28549", "20/11/2021", "10:45", "2:25")
-

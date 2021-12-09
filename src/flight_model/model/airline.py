@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -8,6 +8,7 @@ class Airline(Base):
     Class representing an airline
     """
     __tablename__ = "AIRLINES"
+    __table_args__ = (UniqueConstraint('name', name='AIRLINE_NAME_UX'),)
 
     #: Primary key
     id = Column(Integer, primary_key=True)

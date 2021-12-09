@@ -4,7 +4,7 @@ in terms of the number of rows of seats and the seat letters in each row. They a
 of seats on a flight
 """
 
-from sqlalchemy import Column, ForeignKey, UniqueConstraint, Integer, String
+from sqlalchemy import Column, ForeignKey, UniqueConstraint, Integer, String, Index
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -23,7 +23,7 @@ class AircraftLayout(Base):
     #: Aircraft model e.g. A321
     aircraft = Column(String, nullable=False)
     #: Layout name e.g. Neo
-    name = Column(String, nullable=True)
+    name = Column(String, nullable=False)
     #: Related airline instance
     airline = relationship("Airline", back_populates="aircraft_layouts")
     #: Row definitions associated with this layout
