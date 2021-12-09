@@ -3,10 +3,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from src.flight_model.model import create_database, Session, Flight, AircraftLayout, Seat, Airline
 from src.flight_model.logic import create_airport
-from src.flight_model.logic import create_airline
-from src.flight_model.logic import create_flight
+from src.flight_model.logic import create_airline, get_airline
+from src.flight_model.logic import create_flight, list_flights
 from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts, create_layout, \
-    add_row_to_layout
+    add_row_to_layout, get_layout, delete_layout
 from tests.flight_model.utils import create_test_layout, create_test_passengers_on_flight
 
 
@@ -302,3 +302,32 @@ class TestAircraftLayouts(unittest.TestCase):
         with self.assertRaises(IntegrityError), Session.begin() as session:
             layout = session.query(AircraftLayout).first()
             _ = add_row_to_layout(layout.id, 1, "Economy", "ABCDEF")
+
+    def test_can_get_layout(self):
+        airline = get_airline("British Airways")
+        layouts = list_layouts(airline.id)
+        layout = get_layout(layouts[0].id)
+        self.assertEqual("British Airways", layout.airline.name)
+        self.assertEqual("A320", layout.aircraft)
+        self.assertEqual("", layout.name)
+        self.assertEqual(1, len(layout.row_definitions))
+        self.assertEqual("ABCDEF", layout.row_definitions[0].seats)
+
+    def test_cannot_get_missing_layout(self):
+        with self.assertRaises(ValueError):
+            _ = get_layout(-1)
+
+    def test_can_delete_layout(self):
+        airline = get_airline("British Airways")
+        layouts = list_layouts(airline.id)
+        delete_layout(layouts[0].id)
+        layouts = list_layouts(airline.id)
+        self.assertEqual(0, len(layouts))
+
+    def test_cannot_delete_layout_in_use(self):
+        airline = get_airline("EasyJet")
+        flights = list_flights(airline.id)
+        layouts = list_layouts(airline.id)
+        apply_aircraft_layout(flights[0].id, layouts[0].id)
+        with self.assertRaises(ValueError):
+            delete_layout(layouts[0].id)
