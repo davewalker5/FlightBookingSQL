@@ -5,7 +5,7 @@ The layouts blueprint supplies view functions and templates for aircraft layout 
 from flask import Blueprint, render_template, redirect, request
 from flight_model.logic import get_flight
 from flight_model.logic import list_airlines
-from flight_model.logic import list_layouts, apply_aircraft_layout
+from flight_model.logic import list_layouts, apply_aircraft_layout, get_layout, delete_layout
 from flight_model.data_exchange import import_aircraft_layout_from_stream
 
 
@@ -59,7 +59,8 @@ def list_all():
     :return: The HTML for the airline listing page
     """
     return render_template("layouts/list.html",
-                           layouts=list_layouts(None))
+                           layouts=list_layouts(None),
+                           edit_enabled=True)
 
 
 @layouts_bp.route("/add", methods=["GET", "POST"])
@@ -84,3 +85,27 @@ def add():
         return render_template("layouts/add.html",
                                airlines=list_airlines(),
                                error=None)
+
+
+@layouts_bp.route("/delete/<int:layout_id>", methods=["GET", "POST"])
+def delete(layout_id):
+    """
+    Serve the page to confirm deletion of an aircraft layout and handle the deletion when the form is submitted
+
+    :param layout_id: ID for the airport to delete
+    :return: The rendered airport deletion template or a redirect to the airport list page
+    """
+    if request.method == "POST":
+        try:
+            delete_layout(layout_id)
+            return redirect(f"/layouts/list")
+        except ValueError as e:
+            return render_template("layouts/delete.html",
+                                   layouts=[get_layout(layout_id)],
+                                   error=e,
+                                   edit_enabled=False)
+    else:
+        return render_template("layouts/delete.html",
+                               layouts=[get_layout(layout_id)],
+                               error=None,
+                               edit_enabled=False)

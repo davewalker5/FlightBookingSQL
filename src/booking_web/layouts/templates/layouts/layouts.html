@@ -1,0 +1,28 @@
+{% if layouts | length > 0 %}
+    <table class="striped">
+        <thead>
+            <th>Airline</th>
+            <th>Aircraft</th>
+            <th>Layout</th>
+            {% if edit_enabled %}
+                <th></th>
+            {% endif %}
+        </thead>
+        <tbody>
+            {% for layout in layouts %}
+                <tr>
+                    <td>{{ layout.airline.name }}</td>
+                    <td>{{ layout.aircraft }}</td>
+                    <td>{{ layout.name }}</td>
+                    {% if edit_enabled %}
+                        <td>
+                            <a href="{{ url_for('layouts.delete', layout_id=layout.id) }}">
+                                <i class="fa fa-trash" title="Delete Aircraft Layout"></i>
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

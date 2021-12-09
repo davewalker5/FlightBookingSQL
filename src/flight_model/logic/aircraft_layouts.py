@@ -4,6 +4,7 @@ Aircraft layout and seat allocation business logic
 
 import sqlalchemy as db
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import IntegrityError
 from ..model import Session, AircraftLayout, Flight, Seat, RowDefinition
 
 
@@ -227,3 +228,37 @@ def add_row_to_layout(aircraft_layout_id, row_number, seating_class, seat_letter
         session.add(row_definition)
 
     return row_definition
+
+
+def get_layout(layout_id):
+    """
+    Get the aircraft layout with the specified ID
+
+    :param layout_id: ID of the aircraft layout to return
+    :return: AircraftLayout instance for the specified layout record
+    :raises ValueError: If the layout doesn't exist
+    """
+    with Session.begin() as session:
+        layout = session.query(AircraftLayout) \
+            .options(joinedload(AircraftLayout.airline)) \
+            .get(layout_id)
+
+    if layout is None:
+        raise ValueError("Aircraft layout not found")
+
+    return layout
+
+
+def delete_layout(layout_id):
+    """
+    Delete the airport with the specified ID
+
+    :param layout_id: ID of the aircraft layout to delete
+    :raises ValueError: If the layout is still referenced
+    """
+    try:
+        with Session.begin() as session:
+            layout = session.query(AircraftLayout).get(layout_id)
+            session.delete(layout)
+    except IntegrityError as e:
+        raise ValueError("Cannot delete an aircraft layout that is referenced by a flight") from e
