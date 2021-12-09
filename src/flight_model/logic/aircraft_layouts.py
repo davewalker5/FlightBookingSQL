@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from ..model import Session, AircraftLayout, Flight, Seat, RowDefinition
 
 
-def list_layouts(airline_id):
+def list_layouts(airline_id=None):
     """
     List of aircraft layouts for an airline
 

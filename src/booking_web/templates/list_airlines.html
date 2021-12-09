@@ -1,21 +1,10 @@
 {% extends "layout.html" %}
-{% block title %}Airports{% endblock %}
+{% block title %}Airlines{% endblock %}
 
 {% block content %}
     <h1>Airlines</h1>
     {% if airlines | length > 0 %}
-        <table class="striped">
-            <thead>
-                <th>Name</th>
-            </thead>
-            <tbody>
-                {% for airline in airlines %}
-                    <tr>
-                        <td>{{ airline.name }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% include "airlines.html" with context %}
     {% else %}
         <span>There are no airlines in the database</span>
     {% endif %}

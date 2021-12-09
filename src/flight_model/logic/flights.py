@@ -77,16 +77,23 @@ def create_flight(airline_name, embarkation_code, destination_code, number, depa
     return flight
 
 
-def list_flights():
+def list_flights(airline_id=None):
     """
-    List all flights
+    List all flights or, optionally, all  flights for the specified airline
 
+    :param airline_id: ID for the airline for which to list flights or None for all airlines
     :return: A list of instances of the Flight object with relevant associated attributes eager-loaded
     """
     with Session.begin() as session:
-        flights = session.query(Flight) \
-            .order_by(db.asc(Flight.departure_date)) \
-            .all()
+        if airline_id:
+            flights = session.query(Flight) \
+                .filter(Flight.airline_id == airline_id) \
+                .order_by(db.asc(Flight.departure_date)) \
+                .all()
+        else:
+            flights = session.query(Flight) \
+                .order_by(db.asc(Flight.departure_date)) \
+                .all()
 
     return flights
 

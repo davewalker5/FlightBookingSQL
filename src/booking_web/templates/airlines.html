@@ -1,0 +1,24 @@
+{% if airlines | length > 0 %}
+    <table class="striped">
+        <thead>
+            <th>Name</th>
+            {% if edit_enabled %}
+                <th></th>
+            {% endif %}
+        </thead>
+        <tbody>
+            {% for airline in airlines %}
+                <tr>
+                    <td>{{ airline.name }}</td>
+                    {% if edit_enabled %}
+                        <td>
+                            <a href="{{ url_for('delete_airline_by_id', airline_id=airline.id) }}">
+                                <i class="fa fa-trash" title="Delete Airline"></i>
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

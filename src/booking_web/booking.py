@@ -11,7 +11,7 @@ import datetime
 import pytz
 from flask import Flask, render_template, redirect, request, session
 from flight_model.logic import list_flights, create_flight, get_flight, delete_flight, add_passenger
-from flight_model.logic import list_airlines, create_airline
+from flight_model.logic import list_airlines, create_airline, delete_airline, get_airline
 from flight_model.logic import list_airports, create_airport, get_airport, delete_airport
 from flight_model.logic import list_layouts, apply_aircraft_layout, allocate_seat
 from flight_model.logic import create_passenger, delete_passenger
@@ -357,7 +357,8 @@ def list_all_airlines():
     """
     return render_template("list_airlines.html",
                            options_map=options_map,
-                           airlines=list_airlines())
+                           airlines=list_airlines(),
+                           edit_enabled=True)
 
 
 @app.route("/add_airline", methods=["GET", "POST"])
@@ -379,6 +380,25 @@ def add_airline():
         return render_template("add_airline.html",
                                options_map=options_map,
                                error=None)
+
+
+@app.route("/delete_airline_by_id/<int:airline_id>", methods=["GET", "POST"])
+def delete_airline_by_id(airline_id):
+    """
+    Serve the page to confirm deletion of an airline and handle the deletion when the form is submitted
+
+    :param airline_id: ID for the airline to delete
+    :return: The rendered airport deletion template or a redirect to the airline list page
+    """
+    if request.method == "POST":
+        delete_airline(airline_id)
+        return redirect(f"/list_airlines")
+    else:
+        return render_template("delete_airline.html",
+                               options_map=options_map,
+                               airlines=[get_airline(airline_id)],
+                               error=None,
+                               edit_enabled=False)
 
 
 @app.route("/list_layouts")

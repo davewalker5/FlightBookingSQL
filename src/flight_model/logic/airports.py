@@ -44,6 +44,7 @@ def get_airport(airport_id):
 
     :param airport_id: ID of the airport to return
     :return: Airport instance for the specified airport record
+    :raises ValueError: If the airport doesn't exist
     """
     with Session.begin() as session:
         airport = session.query(Airport).get(airport_id)
@@ -59,6 +60,7 @@ def delete_airport(airport_id):
     Delete the airport with the specified ID
 
     :param airport_id: ID of the airport to delete
+    :raises ValueError: If the airport is still referenced
     """
     try:
         with Session.begin() as session:
