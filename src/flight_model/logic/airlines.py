@@ -28,18 +28,19 @@ def create_airline(name):
 
 @singledispatch
 def get_airline(_):
+    """
+    Return the Airline instance for the airline with the specified identifier
+
+    :param name: Airline name
+    :param airline_id: Airline ID
+    :return: Instance of the airline
+    :raises ValueError: If the airline doesn't exist
+    """
     raise TypeError("Invalid parameter type for get_airline")
 
 
 @get_airline.register(str)
 def _(name):
-    """
-    Return the Airline instance for the airline with the specified name
-
-    :param name: Airline name
-    :return: Instance of the airline
-    :raises ValueError: If the airline doesn't exist
-    """
     try:
         with Session.begin() as session:
             airline = session.query(Airline).filter(Airline.name == name).one()
@@ -51,13 +52,6 @@ def _(name):
 
 @get_airline.register(int)
 def _(airline_id):
-    """
-    Return the Airline instance for the airline with the specified ID
-
-    :param airline_id: Airline ID
-    :return: Instance of the airline
-    :raises ValueError: If the airline doesn't exist
-    """
     with Session.begin() as session:
         airline = session.query(Airline).get(airline_id)
 
