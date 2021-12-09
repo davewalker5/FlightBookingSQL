@@ -1,16 +1,17 @@
 {% extends "layout.html" %}
-{% block title %}Delete Flight{% endblock %}
+{% block title %}Delete Airport{% endblock %}
 
 {% block content %}
-    <h1>Delete Flight</h1>
+    <h1>Delete Airport</h1>
 
-    {% include "flights.html" with context %}
+    {% include "error.html" with context %}
+    {% include "airports.html" with context %}
 
-    <h2>Please confirm you want to delete this flight:</h2>
+    <h2>Please confirm you want to delete this airport:</h2>
     <form method="post">
         <div class="button-bar">
             <button type="button" class="btn btn-light">
-                <a href="/">Cancel</a>
+                <a href="/list_airports">Cancel</a>
             </button>
             <button type="submit" value="delete" class="btn btn-primary">Confirm</button>
         </div>

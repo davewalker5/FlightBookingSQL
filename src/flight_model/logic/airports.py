@@ -36,3 +36,33 @@ def list_airports():
     with Session.begin() as session:
         airports = session.query(Airport).order_by(db.asc(Airport.code)).all()
     return airports
+
+
+def get_airport(airport_id):
+    """
+    Get the airport with the specified ID
+
+    :param airport_id: ID of the airport to return
+    :return: Airport instance for the specified airport record
+    """
+    with Session.begin() as session:
+        airport = session.query(Airport).get(airport_id)
+
+    if airport is None:
+        raise ValueError("Airport not found")
+
+    return airport
+
+
+def delete_airport(airport_id):
+    """
+    Delete the airport with the specified ID
+
+    :param airport_id: ID of the airport to delete
+    """
+    try:
+        with Session.begin() as session:
+            airport = session.query(Airport).get(airport_id)
+            session.delete(airport)
+    except IntegrityError as e:
+        raise ValueError("Cannot delete an airport that is referenced by a flight") from e
