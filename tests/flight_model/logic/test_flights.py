@@ -3,7 +3,7 @@ import unittest
 from src.flight_model.model import create_database, Session, Flight
 from src.flight_model.logic import create_flight, get_flight, list_flights, delete_flight
 from src.flight_model.logic import create_airport
-from src.flight_model.logic import create_airline
+from src.flight_model.logic import create_airline, list_airlines
 from src.flight_model.logic import create_passenger, add_passenger
 
 
@@ -37,9 +37,18 @@ class TestFlights(unittest.TestCase):
         self.assertEqual("20/11/2021", flight.departs_localtime.strftime("%d/%m/%Y"))
         self.assertEqual("2:25", flight.formatted_duration)
 
-    def test_can_list_flights(self):
+    def test_can_list_all_flights(self):
         flights = list_flights()
         self.assertEqual(1, len(flights))
+
+    def test_can_list_flights_by_airline(self):
+        airline = list_airlines()[0]
+        flights = list_flights(airline.id)
+        self.assertEqual(1, len(flights))
+
+    def test_cannot_list_flights_for_missing_airline(self):
+        flights = list_flights(-1)
+        self.assertEqual(0, len(flights))
 
     def test_can_delete_flight(self):
         with Session.begin() as session:

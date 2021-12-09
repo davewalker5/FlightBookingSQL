@@ -3,8 +3,10 @@ Airline business logic
 """
 
 import sqlalchemy as db
+from functools import singledispatch
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from ..model import Session, Airline
+
 
 def create_airline(name):
     """
@@ -12,6 +14,7 @@ def create_airline(name):
 
     :param name: Airline name
     :returns: An instance of the Airline class for the created record
+    :raises ValueError: If the airline is a duplicate
     """
     try:
         with Session.begin() as session:
@@ -23,7 +26,13 @@ def create_airline(name):
     return airline
 
 
-def get_airline(name):
+@singledispatch
+def get_airline(_):
+    raise TypeError("Invalid parameter type for get_airline")
+
+
+@get_airline.register(str)
+def _(name):
     """
     Return the Airline instance for the airline with the specified name
 
@@ -40,6 +49,24 @@ def get_airline(name):
     return airline
 
 
+@get_airline.register(int)
+def _(airline_id):
+    """
+    Return the Airline instance for the airline with the specified ID
+
+    :param airline_id: Airline ID
+    :return: Instance of the airline
+    :raises ValueError: If the airline doesn't exist
+    """
+    with Session.begin() as session:
+        airline = session.query(Airline).get(airline_id)
+
+    if airline is None:
+        raise ValueError("Airline not found")
+
+    return airline
+
+
 def list_airlines():
     """
     List all airlines
@@ -49,3 +76,14 @@ def list_airlines():
     with Session.begin() as session:
         airlines = session.query(Airline).order_by(db.asc(Airline.name)).all()
     return airlines
+
+
+def delete_airline(airline_id):
+    """
+    Delete the airline with the specified ID
+
+    :param airline_id: ID of the airline to delete
+    """
+    with Session.begin() as session:
+        airline = session.query(Airline).get(airline_id)
+        session.delete(airline)
