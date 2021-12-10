@@ -68,7 +68,7 @@ class TestAirlines(unittest.TestCase):
         layouts = list_layouts()
         self.assertEqual(0, len(layouts))
 
-    def test_can_rename_airline(self):
+    def test_can_update_airline(self):
         airline = get_airline("EasyJet")
         update_airline(airline.id, "British Airways")
 
@@ -78,7 +78,11 @@ class TestAirlines(unittest.TestCase):
         updated = get_airline(airline.id)
         self.assertEqual("British Airways", updated.name)
 
-    def test_cannot_rename_airline_to_create_duplicate(self):
+    def test_cannot_update_missing_airline(self):
+        with self.assertRaises(ValueError):
+            update_airline(-1, "SAS")
+
+    def test_cannot_update_airline_to_create_duplicate(self):
         airline = create_airline("British Airways")
         with self.assertRaises(ValueError):
             update_airline(airline.id, "EasyJet")

@@ -362,6 +362,10 @@ class TestAircraftLayouts(unittest.TestCase):
         self.assertEqual("A319", updated.aircraft)
         self.assertEqual("", updated.name)
 
+    def test_cannot_update_missing_layout(self):
+        with self.assertRaises(ValueError):
+            update_layout(-1, "A319", "1")
+
     def test_cannot_update_layout_to_create_duplicate(self):
         airline = get_airline("EasyJet")
         layout = [layout

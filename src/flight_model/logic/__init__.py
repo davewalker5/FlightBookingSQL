@@ -4,7 +4,7 @@ from .flights import create_flight, list_flights, get_flight, delete_flight, add
 from .passengers import create_passenger, delete_passenger
 from .aircraft_layouts import list_layouts, apply_aircraft_layout, allocate_seat, create_layout, add_row_to_layout, \
     get_layout, delete_layout, delete_row_from_layout, update_layout
-from .boarding_cards import generate_boarding_cards, get_boarding_card_path
+from .boarding_cards_generator import BoardingCardsGenerator
 from .exceptions import InvalidOperationError, MissingBoardingCardPluginError
 
 __all__ = [
@@ -34,8 +34,7 @@ __all__ = [
     "allocate_seat",
     "get_layout",
     "delete_layout",
-    "generate_boarding_cards",
-    "get_boarding_card_path",
+    "BoardingCardsGenerator",
     "InvalidOperationError",
     "MissingBoardingCardPluginError"
 ]
