@@ -4,7 +4,7 @@ The boarding cards blueprint supplies view functions and templates for printing 
 
 from flask import Blueprint, render_template, redirect, request, session
 from flight_model.logic import get_flight
-from flight_model.logic import generate_boarding_cards, InvalidOperationError, MissingBoardingCardPluginError
+from flight_model.logic import BoardingCardsGenerator, InvalidOperationError, MissingBoardingCardPluginError
 
 boarding_cards_bp = Blueprint("boarding_cards", __name__, template_folder='templates')
 
@@ -18,9 +18,9 @@ def print_cards(flight_id):
     """
     if request.method == "POST":
         try:
-            # TODO: This should be run on a background thread as it currently blocks the UI thread
-            generate_boarding_cards(flight_id, "pdf", request.form["gate_number"])
-            session["message"] = "Boarding cards have been generated"
+            generator = BoardingCardsGenerator(flight_id, "pdf", request.form["gate_number"])
+            generator.start()
+            session["message"] = "Boarding cards are being generated in the background"
         except (ValueError, InvalidOperationError, MissingBoardingCardPluginError) as e:
             return render_template("boarding_cards/print.html",
                                    flight=get_flight(flight_id),

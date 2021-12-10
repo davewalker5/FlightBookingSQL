@@ -10,5 +10,5 @@ The logic Package
    airports
    flights
    passengers
-   boarding_cards
+   boarding_cards_generator
    exceptions
