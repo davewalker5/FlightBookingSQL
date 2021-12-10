@@ -27,6 +27,13 @@ class TestAircraftLayout(unittest.TestCase):
                 self.assertTrue(row in row_numbers)
                 self.assertEqual("ABCDEF", aircraft_layout.row_definitions[row - 1].seats)
 
+    def test_cannot_update_layout_to_create_duplicate(self):
+        create_test_layout("EasyJet", "A320", "1", 10, "ABCDEF")
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).filter(AircraftLayout.aircraft == "A320").one()
+            aircraft_layout.aircraft = "A321"
+            aircraft_layout.name = "Neo"
+
     def test_can_delete_layout(self):
         with Session.begin() as session:
             # Note that delete won't cascade if we use delete() on the query object. Get the
@@ -86,4 +93,35 @@ class TestAircraftLayout(unittest.TestCase):
                                            number=1,
                                            seating_class="Economy",
                                            seats="ABCDEF")
+            session.add(row_definition)
+
+    def test_can_delete_row(self):
+        with Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_to_delete = aircraft_layout.row_definitions[4]
+            del aircraft_layout.row_definitions[4]
+            session.delete(row_to_delete)
+
+        with Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_numbers = [r.number for r in aircraft_layout.row_definitions]
+            self.assertFalse(5 in row_numbers)
+            self.assertEqual(9, len(aircraft_layout.row_definitions))
+
+    def test_cannot_add_row_with_empty_seats(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
+                                           number=100,
+                                           seating_class="Economy",
+                                           seats="")
+            session.add(row_definition)
+
+    def test_cannot_add_row_with_blanks_seats(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
+                                           number=100,
+                                           seating_class="Economy",
+                                           seats="         ")
             session.add(row_definition)

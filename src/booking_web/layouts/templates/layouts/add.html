@@ -14,14 +14,7 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="form-group">
-            <label>Aircraft Model</label>
-            <input class="form-control" name="aircraft" placeholder="Aircraft model e.g. A321" required>
-        </div>
-        <div class="form-group">
-            <label>Layout Name</label>
-            <input class="form-control" name="layout_name" placeholder="Aircraft layout name e.g. neo">
-        </div>
+        {% include "layouts/details.html" with context %}
         <div class="form-group">
             <label>Layout File</label>
             <input class="form-control" type="file" name="csv_file_name" required>

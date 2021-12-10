@@ -4,7 +4,7 @@ Aircraft layout and seat allocation business logic
 
 import sqlalchemy as db
 from sqlalchemy.orm import joinedload
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from ..model import Session, AircraftLayout, Flight, Seat, RowDefinition
 
 
@@ -211,6 +211,28 @@ def create_layout(airline_id, aircraft_model, layout_name):
     return aircraft_layout
 
 
+def update_layout(layout_id, aircraft_model, layout_name):
+    """
+    Update the core details for an aircraft layout
+
+    :param layout_id: ID for the aircraft layout to update
+    :param aircraft_model: Aircraft model e.g. A321
+    :param layout_name: Layout name e.g. Neo
+    :raises ValueError: If the edit would result in a duplicate layout
+    """
+    try:
+        with Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout)\
+                .filter(AircraftLayout.id == layout_id)\
+                .one()
+            aircraft_layout.aircraft = aircraft_model
+            aircraft_layout.name = layout_name
+    except NoResultFound as e:
+        raise ValueError("Aircraft layout not found") from e
+    except IntegrityError as e:
+        raise ValueError("Cannot update aircraft layout as this would create a duplicate")
+
+
 def add_row_to_layout(aircraft_layout_id, row_number, seating_class, seat_letters):
     """
     Add a row definition to an existing aircraft layout
@@ -262,3 +284,22 @@ def delete_layout(layout_id):
             session.delete(layout)
     except IntegrityError as e:
         raise ValueError("Cannot delete an aircraft layout that is referenced by a flight") from e
+
+
+def delete_row_from_layout(layout_id, row_number):
+    """
+    Delete the row with the specified number from the specified layout
+
+    :param layout_id: ID of the aircraft layout from which to delete a row
+    :param row_number: Row number to delete
+    :raises ValueError: If the layout or row don't exist
+    """
+    try:
+        with Session.begin() as session:
+            row_definition = session.query(RowDefinition)\
+                .filter(RowDefinition.aircraft_layout_id == layout_id,
+                        RowDefinition.number == row_number)\
+                .one()
+            session.delete(row_definition)
+    except NoResultFound as e:
+        raise ValueError("Aircraft layout or row number not found") from e

@@ -20,11 +20,16 @@ from .base import Base
 
 def _get_db_path():
     """
-    Return the default path to the database file
+    Return the path to the database file
 
     :return: The path to the database file
     """
-    return os.path.join(get_data_path(), "airline.db")
+    # If the environment variable is set, it will contain the path to the DB file
+    db_path = os.environ["FLIGHT_BOOKING_DB"] if "FLIGHT_BOOKING_DB" in os.environ else None
+    if not db_path:
+        # Environment variable isn't set, so use the dev/test database
+        db_path = os.path.join(get_data_path(), "flight_booking_dev.db")
+    return db_path
 
 
 def _delete_db():

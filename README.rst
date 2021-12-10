@@ -29,6 +29,7 @@ With those pre-requisites in place, to populate the database with sample data ru
 
 ::
 
+    export FLIGHT_BOOKING_DB="`pwd`/../data/flight_booking.db"
     python -m flight_model
 
 With the sample data in place, to run the web-based application in the Flask development web server, enter the
@@ -36,6 +37,7 @@ following from the "src/booking_web" folder:
 
 ::
 
+    export FLIGHT_BOOKING_DB="`pwd`/../../data/flight_booking.db"
     export PYTHONPATH=`pwd`/..
     export FLASK_APP=booking.py
     export FLASK_ENV=development

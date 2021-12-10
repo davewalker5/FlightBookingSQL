@@ -5,7 +5,7 @@ The layouts blueprint supplies view functions and templates for aircraft layout 
 from flask import Blueprint, render_template, redirect, request
 from flight_model.logic import get_flight
 from flight_model.logic import list_airlines
-from flight_model.logic import list_layouts, apply_aircraft_layout, get_layout, delete_layout
+from flight_model.logic import list_layouts, apply_aircraft_layout, get_layout, delete_layout, update_layout
 from flight_model.data_exchange import import_aircraft_layout_from_stream
 
 
@@ -84,6 +84,28 @@ def add():
     else:
         return render_template("layouts/add.html",
                                airlines=list_airlines(),
+                               error=None)
+
+
+@layouts_bp.route("/edit/<int:layout_id>", methods=["GET", "POST"])
+def edit(layout_id):
+    """
+    Serve the page to edit an existing aircraft layout and handle the action when the form is submitted
+
+    :param layout_id: ID for the layout to edit
+    :return: The HTML for the aircraft layout upload page or a response object redirecting to the layout list page
+    """
+    if request.method == "POST":
+        try:
+            update_layout(layout_id, request.form["aircraft"], request.form["layout_name"])
+            return redirect("/layouts/list")
+        except ValueError as e:
+            return render_template("layouts/edit.html",
+                                   layout=get_layout(layout_id),
+                                   error=e)
+    else:
+        return render_template("layouts/edit.html",
+                               layout=get_layout(layout_id),
                                error=None)
 
 

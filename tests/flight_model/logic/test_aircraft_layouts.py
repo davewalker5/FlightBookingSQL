@@ -6,7 +6,7 @@ from src.flight_model.logic import create_airport
 from src.flight_model.logic import create_airline, get_airline
 from src.flight_model.logic import create_flight, list_flights
 from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts, create_layout, \
-    add_row_to_layout, get_layout, delete_layout
+    add_row_to_layout, get_layout, delete_layout, delete_row_from_layout, update_layout
 from tests.flight_model.utils import create_test_layout, create_test_passengers_on_flight
 
 
@@ -331,3 +331,53 @@ class TestAircraftLayouts(unittest.TestCase):
         apply_aircraft_layout(flights[0].id, layouts[0].id)
         with self.assertRaises(ValueError):
             delete_layout(layouts[0].id)
+
+    def test_can_delete_row(self):
+        airline = get_airline("EasyJet")
+        layouts = list_layouts(airline.id)
+        layout = [layout for layout in layouts if layout.aircraft == "A321" and layout.name == "Neo"][0]
+        delete_row_from_layout(layout.id, 5)
+        updated = get_layout(layout.id)
+        row_numbers = [r.number for r in updated.row_definitions]
+        self.assertFalse(5 in row_numbers)
+        self.assertEqual(9, len(updated.row_definitions))
+
+    def test_cannot_delete_missing_row(self):
+        layouts = list_layouts()
+        with self.assertRaises(ValueError):
+            delete_row_from_layout(layouts[0].id, 1000)
+
+    def test_cannot_delete_row_from_missing_layout(self):
+        with self.assertRaises(ValueError):
+            delete_row_from_layout(-1, 1)
+
+    def test_can_update_layout(self):
+        airline = get_airline("EasyJet")
+        layout = [layout
+                  for layout in list_layouts(airline.id)
+                  if layout.aircraft == "A321"][0]
+        update_layout(layout.id, "A319", "")
+        updated = get_layout(layout.id)
+        self.assertEqual("EasyJet", updated.airline.name)
+        self.assertEqual("A319", updated.aircraft)
+        self.assertEqual("", updated.name)
+
+    def test_cannot_update_layout_to_create_duplicate(self):
+        airline = get_airline("EasyJet")
+        layout = [layout
+                  for layout in list_layouts(airline.id)
+                  if layout.aircraft == "A320"][0]
+        with self.assertRaises(ValueError):
+            update_layout(layout.id, "A321", "Neo")
+
+    def test_cannot_add_row_with_empty_seats(self):
+        airline = get_airline("British Airways")
+        layouts = list_layouts(airline.id)
+        with self.assertRaises(IntegrityError):
+            add_row_to_layout(layouts[0].id, 100, "Economy", "")
+
+    def test_cannot_add_row_with_blank_seats(self):
+        airline = get_airline("British Airways")
+        layouts = list_layouts(airline.id)
+        with self.assertRaises(IntegrityError):
+            add_row_to_layout(layouts[0].id, 100, "Economy", "         ")
