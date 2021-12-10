@@ -211,6 +211,28 @@ def create_layout(airline_id, aircraft_model, layout_name):
     return aircraft_layout
 
 
+def update_layout(layout_id, aircraft_model, layout_name):
+    """
+    Update the core details for an aircraft layout
+
+    :param layout_id: ID for the aircraft layout to update
+    :param aircraft_model: Aircraft model e.g. A321
+    :param layout_name: Layout name e.g. Neo
+    :raises ValueError: If the edit would result in a duplicate layout
+    """
+    try:
+        with Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout)\
+                .filter(AircraftLayout.id == layout_id)\
+                .one()
+            aircraft_layout.aircraft = aircraft_model
+            aircraft_layout.name = layout_name
+    except NoResultFound as e:
+        raise ValueError("Aircraft layout not found") from e
+    except IntegrityError as e:
+        raise ValueError("Cannot update aircraft layout as this would create a duplicate")
+
+
 def add_row_to_layout(aircraft_layout_id, row_number, seating_class, seat_letters):
     """
     Add a row definition to an existing aircraft layout

@@ -6,7 +6,7 @@ from src.flight_model.logic import create_airport
 from src.flight_model.logic import create_airline, get_airline
 from src.flight_model.logic import create_flight, list_flights
 from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts, create_layout, \
-    add_row_to_layout, get_layout, delete_layout, delete_row_from_layout
+    add_row_to_layout, get_layout, delete_layout, delete_row_from_layout, update_layout
 from tests.flight_model.utils import create_test_layout, create_test_passengers_on_flight
 
 
@@ -350,3 +350,22 @@ class TestAircraftLayouts(unittest.TestCase):
     def test_cannot_delete_row_from_missing_layout(self):
         with self.assertRaises(ValueError):
             delete_row_from_layout(-1, 1)
+
+    def test_can_update_layout(self):
+        airline = get_airline("EasyJet")
+        layout = [layout
+                  for layout in list_layouts(airline.id)
+                  if layout.aircraft == "A321"][0]
+        update_layout(layout.id, "A319", "")
+        updated = get_layout(layout.id)
+        self.assertEqual("EasyJet", updated.airline.name)
+        self.assertEqual("A319", updated.aircraft)
+        self.assertEqual("", updated.name)
+
+    def test_cannot_update_layout_to_create_duplicate(self):
+        airline = get_airline("EasyJet")
+        layout = [layout
+                  for layout in list_layouts(airline.id)
+                  if layout.aircraft == "A320"][0]
+        with self.assertRaises(ValueError):
+            update_layout(layout.id, "A321", "Neo")
