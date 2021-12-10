@@ -4,7 +4,7 @@ Aircraft layout and seat allocation business logic
 
 import sqlalchemy as db
 from sqlalchemy.orm import joinedload
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from ..model import Session, AircraftLayout, Flight, Seat, RowDefinition
 
 
@@ -262,3 +262,22 @@ def delete_layout(layout_id):
             session.delete(layout)
     except IntegrityError as e:
         raise ValueError("Cannot delete an aircraft layout that is referenced by a flight") from e
+
+
+def delete_row_from_layout(layout_id, row_number):
+    """
+    Delete the row with the specified number from the specified layout
+
+    :param layout_id: ID of the aircraft layout from which to delete a row
+    :param row_number: Row number to delete
+    :raises ValueError: If the layout or row don't exist
+    """
+    try:
+        with Session.begin() as session:
+            row_definition = session.query(RowDefinition)\
+                .filter(RowDefinition.aircraft_layout_id == layout_id,
+                        RowDefinition.number == row_number)\
+                .one()
+            session.delete(row_definition)
+    except NoResultFound as e:
+        raise ValueError("Aircraft layout or row number not found") from e

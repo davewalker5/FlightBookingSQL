@@ -87,3 +87,16 @@ class TestAircraftLayout(unittest.TestCase):
                                            seating_class="Economy",
                                            seats="ABCDEF")
             session.add(row_definition)
+
+    def test_can_delete_row(self):
+        with Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_to_delete = aircraft_layout.row_definitions[4]
+            del aircraft_layout.row_definitions[4]
+            session.delete(row_to_delete)
+
+        with Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_numbers = [r.number for r in aircraft_layout.row_definitions]
+            self.assertFalse(5 in row_numbers)
+            self.assertEqual(9, len(aircraft_layout.row_definitions))
