@@ -16,6 +16,25 @@ class TestAirline(unittest.TestCase):
             airline = session.query(Airline).filter(Airline.name == "EasyJet").one()
             self.assertEqual("EasyJet", airline.name)
 
+    def test_cannot_add_duplicate_airline(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            session.add(Airline(name="EasyJet"))
+
+    def test_can_rename_airline(self):
+        with Session.begin() as session:
+            airline = session.query(Airline).one()
+            airline.name = "British Airways"
+
+        with Session.begin() as session:
+            airline = session.query(Airline).one()
+            self.assertEqual("British Airways", airline.name)
+
+    def test_cannot_rename_airline_to_create_duplicate(self):
+        _ = create_airline("British Airways")
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            airline = session.query(Airline).filter(Airline.name == "British Airways").one()
+            airline.name = "EasyJet"
+
     def test_can_delete_airline(self):
         with Session.begin() as session:
             session.query(Airline).filter(Airline.name == "EasyJet").delete()

@@ -2,7 +2,7 @@ import unittest
 from src.flight_model.model import create_database, Session, Airline
 from src.flight_model.logic import create_airport
 from src.flight_model.logic import create_flight, list_flights
-from src.flight_model.logic import create_airline, list_airlines, get_airline, delete_airline
+from src.flight_model.logic import create_airline, list_airlines, get_airline, delete_airline, update_airline
 from src.flight_model.logic import create_layout, list_layouts
 
 
@@ -67,3 +67,18 @@ class TestAirlines(unittest.TestCase):
         delete_airline(airline.id)
         layouts = list_layouts()
         self.assertEqual(0, len(layouts))
+
+    def test_can_rename_airline(self):
+        airline = get_airline("EasyJet")
+        update_airline(airline.id, "British Airways")
+
+        with self.assertRaises(ValueError):
+            _ = get_airline("EasyJet")
+
+        updated = get_airline(airline.id)
+        self.assertEqual("British Airways", updated.name)
+
+    def test_cannot_rename_airline_to_create_duplicate(self):
+        airline = create_airline("British Airways")
+        with self.assertRaises(ValueError):
+            update_airline(airline.id, "EasyJet")

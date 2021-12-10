@@ -81,3 +81,21 @@ def delete_airline(airline_id):
     with Session.begin() as session:
         airline = session.query(Airline).get(airline_id)
         session.delete(airline)
+
+
+def update_airline(airline_id, name):
+    """
+    Update an airline record with a new set of properties
+
+    :param airline_id: ID of the airline to update
+    :param name: New airline name
+    :raises ValueError: If the airline becomes a duplicate as part of the update
+    """
+    try:
+        with Session.begin() as session:
+            airline = session.query(Airline).get(airline_id)
+            airline.name = name
+    except NoResultFound as e:
+        raise ValueError("Airline not found") from e
+    except IntegrityError as e:
+        raise ValueError("Cannot update airline as this would create a duplicate") from e

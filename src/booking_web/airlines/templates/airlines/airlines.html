@@ -4,6 +4,7 @@
             <th>Name</th>
             {% if edit_enabled %}
                 <th></th>
+                <th></th>
             {% endif %}
         </thead>
         <tbody>
@@ -11,6 +12,11 @@
                 <tr>
                     <td>{{ airline.name }}</td>
                     {% if edit_enabled %}
+                        <td>
+                            <a href="{{ url_for('airlines.edit', airline_id=airline.id) }}">
+                                <i class="fa fa-edit" title="Edit Airline"></i>
+                            </a>
+                        </td>
                         <td>
                             <a href="{{ url_for('airlines.delete', airline_id=airline.id) }}">
                                 <i class="fa fa-trash" title="Delete Airline"></i>

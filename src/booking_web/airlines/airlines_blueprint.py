@@ -3,7 +3,7 @@ The airlines blueprint supplies view functions and templates for airline managem
 """
 
 from flask import Blueprint, render_template, redirect, request
-from flight_model.logic import list_airlines, create_airline, delete_airline, get_airline
+from flight_model.logic import list_airlines, create_airline, delete_airline, get_airline, update_airline
 
 
 airlines_bp = Blueprint("airlines", __name__, template_folder='templates')
@@ -20,23 +20,28 @@ def list_all():
                            airlines=list_airlines(),
                            edit_enabled=True)
 
-
-@airlines_bp.route("/add", methods=["GET", "POST"])
-def add():
+@airlines_bp.route("/edit", defaults={"airline_id": None}, methods=["GET", "POST"])
+@airlines_bp.route("/edit/<int:airline_id>", methods=["GET", "POST"])
+def edit(airline_id):
     """
-    Serve the page to add an airline and handle the addition when the form is submitted
+    Serve the page to add/edit an airline and handle the appropriate action when the form is submitted
 
     :return: The HTML for the airline entry page or a response object redirecting to the airline list page
     """
     if request.method == "POST":
         try:
-            _ = create_airline(request.form["name"])
+            if airline_id:
+                update_airline(airline_id, request.form["name"])
+            else:
+                _ = create_airline(request.form["name"])
             return redirect("/airlines/list")
         except ValueError as e:
-            return render_template("airlines/add.html",
+            return render_template("airlines/edit.html",
+                                   airline_id=airline_id,
                                    error=e)
     else:
-        return render_template("airlines/add.html",
+        return render_template("airlines/edit.html",
+                               airline_id=airline_id,
                                error=None)
 
 

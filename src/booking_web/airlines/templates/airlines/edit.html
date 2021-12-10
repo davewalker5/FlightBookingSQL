@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}
+    {% if airline_id %}
+        Edit Airline
+    {% else %}
+        Add Airline
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h1>
+        {% if airline_id %}
+            Edit Airline
+        {% else %}
+            Add Airline
+        {% endif %}
+    </h1>
+    {% include "error.html" with context %}
+    <form method="post">
+        <div class="form-group">
+            <label>Name</label>
+            <input class="form-control" name="name" placeholder="Airline name" required>
+        </div>
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('airlines.list_all') }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">
+                {% if airline_id %}
+                    Save Airline
+                {% else %}
+                    Add Airline
+                {% endif %}
+            </button>
+        </div>
+    </form>
+{% endblock %}
