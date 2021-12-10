@@ -6,6 +6,7 @@
             <th>Layout</th>
             {% if edit_enabled %}
                 <th></th>
+                <th></th>
             {% endif %}
         </thead>
         <tbody>
@@ -15,6 +16,11 @@
                     <td>{{ layout.aircraft }}</td>
                     <td>{{ layout.name }}</td>
                     {% if edit_enabled %}
+                        <td>
+                            <a href="{{ url_for('layouts.edit', layout_id=layout.id) }}">
+                                <i class="fa fa-edit" title="Edit Aircraft Layout"></i>
+                            </a>
+                        </td>
                         <td>
                             <a href="{{ url_for('layouts.delete', layout_id=layout.id) }}">
                                 <i class="fa fa-trash" title="Delete Aircraft Layout"></i>

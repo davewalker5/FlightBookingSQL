@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block title %}Edit Aircraft Layout{% endblock %}
+
+{% block content %}
+    <h1>Edit Aircraft Layout</h1>
+    {% include "error.html" with context %}
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Airline</label>
+            <input class="form-control" value="{{ layout.airline.name }}" readonly>
+        </div>
+        {% include "layouts/details.html" with context %}
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('layouts.list_all') }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">Save Layout</button>
+        </div>
+    </form>
+{% endblock %}
