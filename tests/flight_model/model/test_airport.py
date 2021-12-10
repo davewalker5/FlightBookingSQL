@@ -35,3 +35,25 @@ class TestAirport(unittest.TestCase):
     def test_cannot_add_airport_with_duplicate_code(self):
         with self.assertRaises(ValueError):
             create_airport("LGW", "Name", "TZ")
+
+    def test_can_edit_airport(self):
+        with Session.begin() as session:
+            airport = session.query(Airport).filter(Airport.code == "LGW").one()
+            airport.code = "ALC"
+            airport.name = "Alicante"
+            airport.timezone = "Europe/Madrid"
+
+        with self.assertRaises(NoResultFound), Session.begin() as session:
+            _ = session.query(Airport).filter(Airport.code == "LGW").one()
+
+        with Session.begin() as session:
+            airport = session.query(Airport).filter(Airport.code == "ALC").one()
+            self.assertEqual("ALC", airport.code)
+            self.assertEqual("Alicante", airport.name)
+            self.assertEqual("Europe/Madrid", airport.timezone)
+
+    def test_cannot_edit_airport_to_create_duplicate_code(self):
+        create_airport("RMU", "Murcia International Airport", "Europe/Madrid")
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            airport = session.query(Airport).filter(Airport.code == "LGW").one()
+            airport.code = "RMU"

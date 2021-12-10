@@ -1,7 +1,6 @@
 import unittest
-from sqlalchemy.exc import IntegrityError
 from src.flight_model.model import create_database, Session, Airport
-from src.flight_model.logic import create_airport, list_airports, get_airport, delete_airport
+from src.flight_model.logic import create_airport, list_airports, get_airport, delete_airport, update_airport
 from src.flight_model.logic import create_airline
 from src.flight_model.logic import create_flight
 
@@ -53,3 +52,21 @@ class TestAirports(unittest.TestCase):
         airport = list_airports()[0]
         with self.assertRaises(ValueError):
             delete_airport(airport.id)
+
+    def test_can_edit_airport(self):
+        airport = list_airports()[0]
+        update_airport(airport.id, "ALC", "Alicante", "Europe/Madrid")
+        updated = get_airport(airport.id)
+        self.assertEqual("ALC", updated.code)
+        self.assertEqual("Alicante", updated.name)
+        self.assertEqual("Europe/Madrid", updated.timezone)
+
+    def test_cannot_edit_airport_to_create_duplicate_code(self):
+        airport = list_airports()[0]
+        create_airport("RMU", "Murcia International Airport", "Europe/Madrid")
+        with self.assertRaises(ValueError):
+            update_airport(airport.id, "RMU", "Murcia", "Europe/Madrid")
+
+    def test_cannot_edit_missing_airport(self):
+        with self.assertRaises(ValueError):
+            update_airport(-1, "RMU", "Murcia", "Europe/Madrid")

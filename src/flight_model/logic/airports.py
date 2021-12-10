@@ -3,7 +3,7 @@ Airport business logic
 """
 
 import sqlalchemy as db
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from ..model import Session, Airport
 
 
@@ -68,3 +68,25 @@ def delete_airport(airport_id):
             session.delete(airport)
     except IntegrityError as e:
         raise ValueError("Cannot delete an airport that is referenced by a flight") from e
+
+
+def update_airport(airport_id, code, name, timezone):
+    """
+    Update an airport record with a new set of properties
+
+    :param airport_id: ID of the airline to update
+    :param code: 3-letter IATA airport code
+    :param name: New airline name
+    :param timezone: Timezone the airport is in
+    :raises ValueError: If the airport becomes a duplicate as part of the update
+    """
+    try:
+        with Session.begin() as session:
+            airport = session.query(Airport).filter(Airport.id == airport_id).one()
+            airport.code = code
+            airport.name = name
+            airport.timezone = timezone
+    except NoResultFound as e:
+        raise ValueError("Airport not found") from e
+    except IntegrityError as e:
+        raise ValueError("Cannot update airport as this would create a duplicate airport code") from e

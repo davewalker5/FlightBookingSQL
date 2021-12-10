@@ -93,7 +93,7 @@ def update_airline(airline_id, name):
     """
     try:
         with Session.begin() as session:
-            airline = session.query(Airline).get(airline_id)
+            airline = session.query(Airline).filter(Airline.id == airline_id).one()
             airline.name = name
     except NoResultFound as e:
         raise ValueError("Airline not found") from e
