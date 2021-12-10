@@ -107,3 +107,21 @@ class TestAircraftLayout(unittest.TestCase):
             row_numbers = [r.number for r in aircraft_layout.row_definitions]
             self.assertFalse(5 in row_numbers)
             self.assertEqual(9, len(aircraft_layout.row_definitions))
+
+    def test_cannot_add_row_with_empty_seats(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
+                                           number=100,
+                                           seating_class="Economy",
+                                           seats="")
+            session.add(row_definition)
+
+    def test_cannot_add_row_with_blanks_seats(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
+                                           number=100,
+                                           seating_class="Economy",
+                                           seats="         ")
+            session.add(row_definition)

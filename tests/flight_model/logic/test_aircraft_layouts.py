@@ -369,3 +369,15 @@ class TestAircraftLayouts(unittest.TestCase):
                   if layout.aircraft == "A320"][0]
         with self.assertRaises(ValueError):
             update_layout(layout.id, "A321", "Neo")
+
+    def test_cannot_add_row_with_empty_seats(self):
+        airline = get_airline("British Airways")
+        layouts = list_layouts(airline.id)
+        with self.assertRaises(IntegrityError):
+            add_row_to_layout(layouts[0].id, 100, "Economy", "")
+
+    def test_cannot_add_row_with_blank_seats(self):
+        airline = get_airline("British Airways")
+        layouts = list_layouts(airline.id)
+        with self.assertRaises(IntegrityError):
+            add_row_to_layout(layouts[0].id, 100, "Economy", "         ")

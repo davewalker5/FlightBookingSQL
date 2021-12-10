@@ -4,7 +4,7 @@ in terms of the number of rows of seats and the seat letters in each row. They a
 of seats on a flight
 """
 
-from sqlalchemy import Column, ForeignKey, UniqueConstraint, Integer, String, Index
+from sqlalchemy import Column, ForeignKey, UniqueConstraint, Integer, String, CheckConstraint
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -48,7 +48,6 @@ class RowDefinition(Base):
     Row definition for an aircraft layout, giving the row number and the seat letters in that row
     """
     __tablename__ = "ROW_DEFINITIONS"
-    __table_args__ = (UniqueConstraint('aircraft_layout_id', 'number', name='AIRLINE_AIRCRAFT_LAYOUT_UX'),)
 
     #: Primary key
     id = Column(Integer, primary_key=True)
@@ -62,6 +61,11 @@ class RowDefinition(Base):
     seats = Column(String, nullable=False)
     #: Parent aircraft layout instance
     aircraft_layout = relationship("AircraftLayout", back_populates="row_definitions")
+
+    __table_args__ = (
+        UniqueConstraint('aircraft_layout_id', 'number', name='AIRLINE_AIRCRAFT_LAYOUT_UX'),
+        CheckConstraint("LENGTH(TRIM(seats)) > 0")
+    )
 
     def __repr__(self):
         return f"{type(self).__name__}(" \
