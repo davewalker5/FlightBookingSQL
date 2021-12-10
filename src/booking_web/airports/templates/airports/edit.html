@@ -1,0 +1,50 @@
+{% if airport %}
+    {% set title = "Edit Airport" %}
+    {% set submit_title = "Save Airport" %}
+    {% set code = airport.code %}
+    {% set name = airport.name %}
+    {% set current_timezone = airport.timezone %}
+{% else %}
+    {% set title = "Add Airport" %}
+    {% set submit_title = "Add Airport" %}
+    {% set code = "" %}
+    {% set name = "" %}
+    {% set current_timezone = "" %}
+{% endif %}
+
+{% extends "layout.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    {% include "error.html" with context %}
+    <form method="post">
+        <div class="form-group">
+            <label>Code</label>
+            <input class="form-control" name="code" placeholder="Airport code e.g. LGW"
+                   value="{{ code }}" required>
+        </div>
+        <div class="form-group">
+            <label>Name</label>
+            <input class="form-control" name="name" placeholder="Airport name e.g. London Gatwick"
+                   value="{{ name }}" required>
+        </div>
+        <div class="form-group">
+            <label>Timezone</label>
+            <select name="timezone" class="form-control" required>
+                <option value="">Please select ...</option>
+                {% for timezone in timezones %}
+                    <option value="{{ timezone }}" {% if timezone == current_timezone %}selected{% endif %}>
+                        {{ timezone }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('airports.list_all') }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">{{ submit_title }}</button>
+        </div>
+    </form>
+{% endblock %}

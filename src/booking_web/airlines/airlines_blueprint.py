@@ -26,6 +26,7 @@ def edit(airline_id):
     """
     Serve the page to add/edit an airline and handle the appropriate action when the form is submitted
 
+    :param airline_id: ID for an airline to edit or None to create a new airline
     :return: The HTML for the airline entry page or a response object redirecting to the airline list page
     """
     if request.method == "POST":
@@ -36,12 +37,14 @@ def edit(airline_id):
                 _ = create_airline(request.form["name"])
             return redirect("/airlines/list")
         except ValueError as e:
+            airline = get_airline(airline_id) if airline_id else None
             return render_template("airlines/edit.html",
-                                   airline_id=airline_id,
+                                   airline=airline,
                                    error=e)
     else:
+        airline = get_airline(airline_id) if airline_id else None
         return render_template("airlines/edit.html",
-                               airline_id=airline_id,
+                               airline=airline,
                                error=None)
 
 

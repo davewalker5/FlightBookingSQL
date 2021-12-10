@@ -4,7 +4,7 @@ The airports blueprint supplies view functions and templates for airport managem
 
 import pytz
 from flask import Blueprint, render_template, redirect, request
-from flight_model.logic import list_airports, create_airport, get_airport, delete_airport
+from flight_model.logic import list_airports, create_airport, get_airport, delete_airport, update_airport
 
 airports_bp = Blueprint("airports", __name__, template_folder='templates')
 
@@ -21,24 +21,34 @@ def list_all():
                            edit_enabled=True)
 
 
-@airports_bp.route("/add", methods=["GET", "POST"])
-def add():
+@airports_bp.route("/edit", defaults={"airport_id": None}, methods=["GET", "POST"])
+@airports_bp.route("/add/<int:airport_id>", methods=["GET", "POST"])
+def edit(airport_id):
     """
-    Serve the page to add an airport and handle the addition when the form is submitted
+    Serve the page to add  new airport or edit an existing one and handle the appropriate action
+    when the form is submitted
 
+    :param airport_id: ID for an airport to edit or None to create a new airport
     :return: The HTML for the airport entry page or a response object redirecting to the airport list page
     """
     if request.method == "POST":
         try:
-            _ = create_airport(request.form["code"], request.form["name"], request.form["timezone"])
+            if airport_id:
+                update_airport(airport_id, request.form["code"], request.form["name"], request.form["timezone"])
+            else:
+                _ = create_airport(request.form["code"], request.form["name"], request.form["timezone"])
             return redirect("/airports/list")
         except ValueError as e:
-            return render_template("airports/add.html",
+            airport = get_airport(airport_id) if airport_id else None
+            return render_template("airports/edit.html",
                                    timezones=pytz.all_timezones,
+                                   airport=airport,
                                    error=e)
     else:
-        return render_template("airports/add.html",
+        airport = get_airport(airport_id) if airport_id else None
+        return render_template("airports/edit.html",
                                timezones=pytz.all_timezones,
+                               airport=airport,
                                error=None)
 
 

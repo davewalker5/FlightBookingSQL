@@ -1,37 +1,29 @@
+{% if airline %}
+    {% set title = "Edit Airline" %}
+    {% set submit_title = "Save Airline" %}
+    {% set name = airline.name %}
+{% else %}
+    {% set title = "Add Airline" %}
+    {% set submit_title = "Add Airline" %}
+    {% set name = "" %}
+{% endif %}
+
 {% extends "layout.html" %}
-{% block title %}
-    {% if airline_id %}
-        Edit Airline
-    {% else %}
-        Add Airline
-    {% endif %}
-{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    <h1>
-        {% if airline_id %}
-            Edit Airline
-        {% else %}
-            Add Airline
-        {% endif %}
-    </h1>
+    <h1>{{ title }}</h1>
     {% include "error.html" with context %}
     <form method="post">
         <div class="form-group">
             <label>Name</label>
-            <input class="form-control" name="name" placeholder="Airline name" required>
+            <input class="form-control" name="name" placeholder="Airline name" value="{{ name }}" required>
         </div>
         <div class="button-bar">
             <button type="button" class="btn btn-light">
                 <a href="{{ url_for('airlines.list_all') }}">Cancel</a>
             </button>
-            <button type="submit" value="create" class="btn btn-primary">
-                {% if airline_id %}
-                    Save Airline
-                {% else %}
-                    Add Airline
-                {% endif %}
-            </button>
+            <button type="submit" value="create" class="btn btn-primary">{{ submit_title }}</button>
         </div>
     </form>
 {% endblock %}

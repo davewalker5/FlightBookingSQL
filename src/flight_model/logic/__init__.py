@@ -1,4 +1,4 @@
-from .airports import create_airport, list_airports, get_airport, delete_airport
+from .airports import create_airport, list_airports, get_airport, delete_airport, update_airport
 from .airlines import create_airline, list_airlines, get_airline, delete_airline, update_airline
 from .flights import create_flight, list_flights, get_flight, delete_flight, add_passenger
 from .passengers import create_passenger, delete_passenger
@@ -12,6 +12,7 @@ __all__ = [
     "list_airports",
     "get_airport",
     "delete_airport",
+    "update_airport",
     "create_airline",
     "list_airlines",
     "get_airline",

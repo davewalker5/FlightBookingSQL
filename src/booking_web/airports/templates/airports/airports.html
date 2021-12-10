@@ -6,6 +6,7 @@
             <th>Timezone</th>
             {% if edit_enabled %}
                 <th></th>
+                <th></th>
             {% endif %}
         </thead>
         <tbody>
@@ -15,6 +16,11 @@
                     <td>{{ airport.name }}</td>
                     <td>{{ airport.timezone }}</td>
                     {% if edit_enabled %}
+                        <td>
+                            <a href="{{ url_for('airports.edit', airport_id=airport.id) }}">
+                                <i class="fa fa-edit" title="Edit Airport"></i>
+                            </a>
+                        </td>
                         <td>
                             <a href="{{ url_for('airports.delete', airport_id=airport.id) }}">
                                 <i class="fa fa-trash" title="Delete Airport"></i>
