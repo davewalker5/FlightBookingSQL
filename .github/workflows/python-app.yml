@@ -35,3 +35,9 @@ jobs:
       run: |
         export PYTHONPATH=`pwd`/src
         python -m unittest
+    - name: Generate Coverage Report
+      run: |
+        export PYTHONPATH=`pwd`/src
+        coverage run -m unittest
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v2
