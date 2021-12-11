@@ -1,3 +1,7 @@
+.. image:: https://github.com/davewalker5/FlightBookingSQL/workflows/Python%20CI%20Build/badge.svg
+    :target: https://github.com/davewalker5/FlightBookingSQL/actions
+    :alt: Build Status
+
 .. image:: https://img.shields.io/github/issues/davewalker5/FlightBookingSQL
     :target: https://github.com/davewalker5/FlightBookingSQL/issues
     :alt: GitHub issues
