@@ -39,6 +39,7 @@ jobs:
       run: |
         export PYTHONPATH=`pwd`/src
         coverage run -m unittest
+        coverage xml
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
