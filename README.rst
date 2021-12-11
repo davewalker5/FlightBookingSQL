@@ -43,7 +43,7 @@ Structure
 +-------------------------------+---------------------------------------------------------------------+
 | flight_model                  | Classes and business logic for the booking system                   |
 +-------------------------------+---------------------------------------------------------------------+
-| booking_web                   | A simple Flask-based web site built over the flight_booking package |
+| booking_web                   | A simple Flask-based web site built over the flight_model package   |
 +-------------------------------+---------------------------------------------------------------------+
 
 
