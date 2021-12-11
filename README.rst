@@ -2,6 +2,10 @@
     :target: https://github.com/davewalker5/FlightBookingSQL/actions
     :alt: Build Status
 
+.. image:: https://codecov.io/gh/davewalker5/FlightBookingSQL/branch/main/graph/badge.svg?token=VMSQMP308C
+    :target: https://codecov.io/gh/davewalker5/FlightBookingSQL
+    :alt: Coverage
+
 .. image:: https://img.shields.io/github/issues/davewalker5/FlightBookingSQL
     :target: https://github.com/davewalker5/FlightBookingSQL/issues
     :alt: GitHub issues
