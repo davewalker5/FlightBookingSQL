@@ -8,6 +8,7 @@ from src.flight_model.logic import create_flight
 from tests.flight_model.utils import create_test_layout, \
     create_test_seating_plan, create_test_passengers_on_flight
 
+
 class TestFlight(unittest.TestCase):
     def setUp(self) -> None:
         create_database()

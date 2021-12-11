@@ -63,7 +63,7 @@ def delete(airport_id):
     if request.method == "POST":
         try:
             delete_airport(airport_id)
-            return redirect(f"/airports/list")
+            return redirect("/airports/list")
         except ValueError as e:
             return render_template("airports/delete.html",
                                    airports=[get_airport(airport_id)],

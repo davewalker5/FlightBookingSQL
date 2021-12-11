@@ -43,6 +43,7 @@ class AircraftLayout(Base):
                f"aircraft={self.aircraft!r}, " \
                f"name={self.name!r})"
 
+
 class RowDefinition(Base):
     """
     Row definition for an aircraft layout, giving the row number and the seat letters in that row

@@ -20,6 +20,7 @@ def list_all():
                            airlines=list_airlines(),
                            edit_enabled=True)
 
+
 @airlines_bp.route("/edit", defaults={"airline_id": None}, methods=["GET", "POST"])
 @airlines_bp.route("/edit/<int:airline_id>", methods=["GET", "POST"])
 def edit(airline_id):
@@ -58,7 +59,7 @@ def delete(airline_id):
     """
     if request.method == "POST":
         delete_airline(airline_id)
-        return redirect(f"/airlines/list")
+        return redirect("/airlines/list")
     else:
         return render_template("airlines/delete.html",
                                airlines=[get_airline(airline_id)],
