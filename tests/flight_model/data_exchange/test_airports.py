@@ -22,4 +22,3 @@ class TestAircraftLayouts(unittest.TestCase):
                 self.assertEqual(airport_code, airport.code)
                 self.assertEqual(airports[airport_code]["name"], airport.name)
                 self.assertEqual(airports[airport_code]["tz"], airport.timezone)
-

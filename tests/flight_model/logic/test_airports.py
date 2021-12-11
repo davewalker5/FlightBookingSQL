@@ -18,7 +18,7 @@ class TestAirports(unittest.TestCase):
             self.assertEqual("Europe/London", airport.timezone)
 
     def test_cannot_create_duplicate_code(self):
-        with self.assertRaises(ValueError), Session.begin() as session:
+        with self.assertRaises(ValueError):
             _ = create_airport("LGW", "Some Airport", "Europe/Madrid")
 
     def test_can_list_airports(self):

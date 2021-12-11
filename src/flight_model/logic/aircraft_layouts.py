@@ -230,7 +230,7 @@ def update_layout(layout_id, aircraft_model, layout_name):
     except NoResultFound as e:
         raise ValueError("Aircraft layout not found") from e
     except IntegrityError as e:
-        raise ValueError("Cannot update aircraft layout as this would create a duplicate")
+        raise ValueError("Cannot update aircraft layout as this would create a duplicate") from e
 
 
 def add_row_to_layout(aircraft_layout_id, row_number, seating_class, seat_letters):

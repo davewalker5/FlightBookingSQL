@@ -17,7 +17,7 @@ class TestAirlines(unittest.TestCase):
             self.assertEqual("EasyJet", airline.name)
 
     def test_cannot_create_duplicate_airline(self):
-        with self.assertRaises(ValueError), Session.begin() as session:
+        with self.assertRaises(ValueError):
             _ = create_airline("EasyJet")
 
     def test_can_list_airlines(self):

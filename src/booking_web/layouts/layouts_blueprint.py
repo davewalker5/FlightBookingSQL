@@ -120,7 +120,7 @@ def delete(layout_id):
     if request.method == "POST":
         try:
             delete_layout(layout_id)
-            return redirect(f"/layouts/list")
+            return redirect("/layouts/list")
         except ValueError as e:
             return render_template("layouts/delete.html",
                                    layouts=[get_layout(layout_id)],
