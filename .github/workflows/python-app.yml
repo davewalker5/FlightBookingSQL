@@ -34,4 +34,4 @@ jobs:
     - name: Test with unittest
       run: |
         export PYTHONPATH="$PROJECT_ROOT/src"
-        pytest
+        python -m unittest
