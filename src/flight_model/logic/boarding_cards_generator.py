@@ -150,10 +150,22 @@ class BoardingCardsGenerator(threading.Thread):
         :param card_format: Boarding card format, used as the file extension
         :return:
         """
-        # Boarding card file names are flight-number_seat-number_date.csv
-        card_folder = os.path.join(get_data_path(), "boarding_cards")
+        # Boarding card file names are flight-number_seat-number_date.csv, with non-alphanumeric characters
+        # replaced with underscores
         file_name = "_".join([flight_number, seat_number, departure_date.strftime("%Y%m%d")])
-
-        # Replace non-alphanumeric characters with underscores
         file_name = re.sub("\\W", "_", file_name).lower()
-        return os.path.join(card_folder, file_name.lower() + "." + card_format)
+        return os.path.join(BoardingCardsGenerator._get_boarding_card_folder(),
+                            file_name.lower() + "." + card_format)
+
+    @staticmethod
+    def _get_boarding_card_folder():
+        """
+        Get the path to the folder where boarding card files are created and create it if it doesn't exist
+
+        :returns: The boarding card folder path
+        """
+        card_folder = os.path.join(get_data_path(), "boarding_cards")
+        if not os.path.exists(card_folder):
+            os.makedirs(card_folder)
+
+        return card_folder
