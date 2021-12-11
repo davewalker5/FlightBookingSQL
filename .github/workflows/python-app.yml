@@ -33,6 +33,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unittest
       run: |
-        export PYTHONPATH="$PROJECT_ROOT/src"
+        #export PYTHONPATH="$PROJECT_ROOT/src"
         # python -m unittest
         pwd
+        ls
