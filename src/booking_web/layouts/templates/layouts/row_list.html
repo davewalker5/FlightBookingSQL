@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Row Definitions - {{ layout.aircraft }} {{ layout.name }}{% endblock %}
+
+{% block content %}
+    <h1>Row Definitions - {{ layout.aircraft }} {{ layout.name }}</h1>
+    {% if layout.row_definitions | length > 0 %}
+        {% include "layouts/rows.html" with context %}
+    {% else %}
+        <span>There are no rows for this layout</span>
+    {% endif %}
+    <div class="button-bar">
+        <button type="button" class="btn btn-primary">
+            <a href="#">Add Row Definition</a>
+        </button>
+    </div>
+{% endblock %}
