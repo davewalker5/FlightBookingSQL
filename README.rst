@@ -1,3 +1,24 @@
+.. image:: https://img.shields.io/github/issues/davewalker5/FlightBookingSQL
+    :target: https://github.com/davewalker5/FlightBookingSQL/issues
+    :alt: GitHub issues
+
+.. image:: https://img.shields.io/github/v/release/davewalker5/FlightBookingSQL.svg?include_prereleases
+    :target: https://github.com/davewalker5/FlightBookingSQL/releases
+    :alt: Releases
+
+.. image:: https://img.shields.io/badge/License-mit-blue.svg
+    :target: https://github.com/davewalker5/FlightBookingSQL/blob/main/LICENSE
+    :alt: License
+
+.. image:: https://img.shields.io/badge/language-python-blue.svg
+    :target: https://www.python.org
+    :alt: Language
+
+.. image:: https://img.shields.io/github/languages/code-size/davewalker5/FlightBookingSQL
+    :target: https://github.com/davewalker5/FlightBookingSQL/
+    :alt: GitHub code size in bytes
+
+
 Airline Booking System with SQLite Back-End
 ===========================================
 
