@@ -31,7 +31,7 @@ booking_web_package_data.append("templates/*.html")
 
 setuptools.setup(
     name="flight_booking_sql",
-    version="1.0.0",
+    version="1.0.1",
     description="Simple aircraft flight booking system",
     packages=setuptools.find_packages("src"),
     include_package_data=True,
