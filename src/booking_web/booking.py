@@ -6,6 +6,7 @@ The site is not responsive but the Bootstrap customizer has been used to generat
 to provide button and form element styling.
 """
 
+import os
 from flask import Flask, redirect
 from booking_web.airports import airports_bp
 from booking_web.airlines import airlines_bp
@@ -15,7 +16,10 @@ from booking_web.flights import flights_bp
 from booking_web.boarding_cards import boarding_cards_bp
 
 
-app = Flask("Flight Booking")
+app = Flask("Flight Booking",
+            static_folder=os.path.join(os.path.dirname(__file__), "static"),
+            template_folder=os.path.join(os.path.dirname(__file__), "templates"))
+
 app.secret_key = b'some secret key'
 app.register_blueprint(airports_bp, url_prefix='/airports')
 app.register_blueprint(airlines_bp, url_prefix='/airlines')
