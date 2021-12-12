@@ -9,6 +9,35 @@ from flight_model.logic import list_airports, create_airport, get_airport, delet
 airports_bp = Blueprint("airports", __name__, template_folder='templates')
 
 
+def _render_airport_editing_page(airport_id, error):
+    """
+    Helper to render the airport editing page
+
+    :param airport_id: ID for the airport to edit
+    :param error: Error message to display on the page or None
+    :return: The rendered airport editing template
+    """
+    airport = get_airport(airport_id) if airport_id else None
+    return render_template("airports/edit.html",
+                           timezones=pytz.all_timezones,
+                           airport=airport,
+                           error=error)
+
+
+def _render_airport_deletion_page(airport_id, error):
+    """
+    Helper to render the airport deletion page
+
+    :param airport_id: ID for the airport to edit
+    :param error: Error message to display on the page or None
+    :return: The rendered airport deletion template
+    """
+    return render_template("airports/delete.html",
+                           airports=[get_airport(airport_id)],
+                           error=error,
+                           edit_enabled=False)
+
+
 @airports_bp.route("/list")
 def list_all():
     """
@@ -39,17 +68,9 @@ def edit(airport_id):
                 _ = create_airport(request.form["code"], request.form["name"], request.form["timezone"])
             return redirect("/airports/list")
         except ValueError as e:
-            airport = get_airport(airport_id) if airport_id else None
-            return render_template("airports/edit.html",
-                                   timezones=pytz.all_timezones,
-                                   airport=airport,
-                                   error=e)
+            return _render_airport_editing_page(airport_id, e)
     else:
-        airport = get_airport(airport_id) if airport_id else None
-        return render_template("airports/edit.html",
-                               timezones=pytz.all_timezones,
-                               airport=airport,
-                               error=None)
+        return _render_airport_editing_page(airport_id, None)
 
 
 @airports_bp.route("/delete/<int:airport_id>", methods=["GET", "POST"])
@@ -65,12 +86,6 @@ def delete(airport_id):
             delete_airport(airport_id)
             return redirect("/airports/list")
         except ValueError as e:
-            return render_template("airports/delete.html",
-                                   airports=[get_airport(airport_id)],
-                                   error=e,
-                                   edit_enabled=False)
+            return _render_airport_deletion_page(airport_id, e)
     else:
-        return render_template("airports/delete.html",
-                               airports=[get_airport(airport_id)],
-                               error=None,
-                               edit_enabled=False)
+        return _render_airport_deletion_page(airport_id, None)

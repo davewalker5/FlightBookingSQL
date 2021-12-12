@@ -20,14 +20,14 @@ from .base import Base
 
 def _get_db_path():
     """
-    Return the path to the database file
+    Return the path to the database file. If the environment variable FLIGHT_BOOKING_DB is set, this will be used
+    as the path to the SQLite database file. If not, then the default "development" database file, in the
+    applications data folder, is  used.
 
     :return: The path to the database file
     """
-    # If the environment variable is set, it will contain the path to the DB file
     db_path = os.environ["FLIGHT_BOOKING_DB"] if "FLIGHT_BOOKING_DB" in os.environ else None
     if not db_path:
-        # Environment variable isn't set, so use the dev/test database
         db_path = os.path.join(get_data_path(), "flight_booking_dev.db")
     return db_path
 

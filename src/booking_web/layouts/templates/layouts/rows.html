@@ -1,0 +1,34 @@
+{% if rows | length  > 0 %}
+    <table class="striped">
+        <thead>
+            <th>Row Number</th>
+            <th>Class</th>
+            <th>Seats</th>
+            {% if edit_enabled %}
+                <th></th>
+                <th></th>
+            {% endif %}
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.number }}</td>
+                <td>{{ row.seating_class }}</td>
+                <td>{{ row.seats }}</td>
+                {% if edit_enabled %}
+                    <td>
+                        <a href="{{ url_for('layouts.edit_row', layout_id=layout.id, row_number=row.number) }}">
+                            <i class="fa fa-edit" title="Edit Row Details"></i>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('layouts.delete_row', layout_id=layout.id, row_number=row.number) }}">
+                            <i class="fa fa-trash" title="Delete Row"></i>
+                        </a>
+                    </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

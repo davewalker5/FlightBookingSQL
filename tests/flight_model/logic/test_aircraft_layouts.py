@@ -1,12 +1,12 @@
 import unittest
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
-from src.flight_model.model import create_database, Session, Flight, AircraftLayout, Seat, Airline
+from src.flight_model.model import create_database, Session, Flight, AircraftLayout, Airline
 from src.flight_model.logic import create_airport
 from src.flight_model.logic import create_airline, get_airline
 from src.flight_model.logic import create_flight, list_flights
-from src.flight_model.logic import apply_aircraft_layout, allocate_seat, list_layouts, create_layout, \
-    add_row_to_layout, get_layout, delete_layout, delete_row_from_layout, update_layout
+from src.flight_model.logic import apply_aircraft_layout, list_layouts, create_layout, add_row_to_layout, get_layout, \
+    delete_layout, update_layout
 from tests.flight_model.utils import create_test_layout, create_test_passengers_on_flight
 
 
@@ -125,183 +125,9 @@ class TestAircraftLayouts(unittest.TestCase):
         with self.assertRaises(ValueError):
             apply_aircraft_layout(flight.id, aircraft_layout_id)
 
-    def test_can_allocate_seat(self):
-        create_test_passengers_on_flight(1)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-        allocate_seat(flight.id, flight.passengers[0].id, "1A")
-
-        with Session.begin() as session:
-            seat = session.query(Seat).filter(Seat.seat_number == "1A").one()
-            self.assertEqual(flight.passengers[0].id, seat.passenger_id)
-
-    def test_cannot_allocate_seat_to_passenger_not_on_flight(self):
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-
-        with self.assertRaises(ValueError):
-            allocate_seat(flight.id, 1, "1A")
-
-    def test_cannot_allocate_non_existent_seat(self):
-        create_test_passengers_on_flight(1)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-
-        with self.assertRaises(ValueError):
-            allocate_seat(flight.id, flight.passengers[0].id, "1000A")
-
-    def test_cannot_allocate_seat_with_no_layout(self):
-        create_test_passengers_on_flight(1)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-
-        with self.assertRaises(ValueError):
-            allocate_seat(flight.id, flight.passengers[0].id, "1000A")
-
-    def test_cannot_allocate_seat_to_passenger_twice(self):
-        create_test_passengers_on_flight(1)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-        allocate_seat(flight.id, flight.passengers[0].id, "1A")
-
-        with self.assertRaises(ValueError):
-            allocate_seat(flight.id, flight.passengers[0].id, "1A")
-
-    def test_cannot_allocate_previously_allocated_seat(self):
-        create_test_passengers_on_flight(2)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-        allocate_seat(flight.id, flight.passengers[0].id, "1A")
-
-        with self.assertRaises(ValueError):
-            allocate_seat(flight.id, flight.passengers[1].id, "1A")
-
-    def test_applying_a_new_layout_copies_seat_allocations(self):
-        create_test_passengers_on_flight(2)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A320",
-                        AircraftLayout.name == "1")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-        allocate_seat(flight.id, flight.passengers[0].id, "1A")
-
-        with Session.begin() as session:
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            self.assertEqual("1A", flight.passengers[0].seats[0].seat_number)
-
-    def test_can_allocate_seat_if_not_in_new_layout(self):
-        create_test_passengers_on_flight(2)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A320",
-                        AircraftLayout.name == "1")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-        allocate_seat(flight.id, flight.passengers[0].id, "1A")
-        allocate_seat(flight.id, flight.passengers[1].id, "1D")
-
-        with Session.begin() as session:
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A321",
-                        AircraftLayout.name == "Neo")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            self.assertEqual("1A", flight.passengers[0].seats[0].seat_number)
-            self.assertEqual("1B", flight.passengers[1].seats[0].seat_number)
-
-    def test_can_move_passenger(self):
-        create_test_passengers_on_flight(1)
-
-        with Session.begin() as session:
-            flight = session.query(Flight).one()
-            aircraft_layout = session.query(AircraftLayout) \
-                .filter(AircraftLayout.airline_id == flight.airline.id,
-                        AircraftLayout.aircraft == "A320",
-                        AircraftLayout.name == "1")\
-                .one()
-
-        apply_aircraft_layout(flight.id, aircraft_layout.id)
-        allocate_seat(flight.id, flight.passengers[0].id, "1A")
-        allocate_seat(flight.id, flight.passengers[0].id, "1B")
-
-        with Session.begin() as session:
-            seat = session.query(Seat).filter(Seat.seat_number == "1A").one()
-            self.assertIsNone(seat.passenger_id)
-
-            seat = session.query(Seat).filter(Seat.seat_number == "1B").one()
-            self.assertIsNotNone(seat.passenger_id)
-
     def test_cannot_add_duplicate_layout(self):
         with self.assertRaises(IntegrityError):
             create_test_layout("EasyJet", "A321", "Neo", 10, "ABCDEF")
-
-    def test_cannot_add_duplicate_row(self):
-        with self.assertRaises(IntegrityError), Session.begin() as session:
-            layout = session.query(AircraftLayout).first()
-            _ = add_row_to_layout(layout.id, 1, "Economy", "ABCDEF")
 
     def test_can_get_layout(self):
         airline = get_airline("British Airways")
@@ -332,25 +158,6 @@ class TestAircraftLayouts(unittest.TestCase):
         with self.assertRaises(ValueError):
             delete_layout(layouts[0].id)
 
-    def test_can_delete_row(self):
-        airline = get_airline("EasyJet")
-        layouts = list_layouts(airline.id)
-        layout = [layout for layout in layouts if layout.aircraft == "A321" and layout.name == "Neo"][0]
-        delete_row_from_layout(layout.id, 5)
-        updated = get_layout(layout.id)
-        row_numbers = [r.number for r in updated.row_definitions]
-        self.assertFalse(5 in row_numbers)
-        self.assertEqual(9, len(updated.row_definitions))
-
-    def test_cannot_delete_missing_row(self):
-        layouts = list_layouts()
-        with self.assertRaises(ValueError):
-            delete_row_from_layout(layouts[0].id, 1000)
-
-    def test_cannot_delete_row_from_missing_layout(self):
-        with self.assertRaises(ValueError):
-            delete_row_from_layout(-1, 1)
-
     def test_can_update_layout(self):
         airline = get_airline("EasyJet")
         layout = [layout
@@ -373,15 +180,3 @@ class TestAircraftLayouts(unittest.TestCase):
                   if layout.aircraft == "A320"][0]
         with self.assertRaises(ValueError):
             update_layout(layout.id, "A321", "Neo")
-
-    def test_cannot_add_row_with_empty_seats(self):
-        airline = get_airline("British Airways")
-        layouts = list_layouts(airline.id)
-        with self.assertRaises(IntegrityError):
-            add_row_to_layout(layouts[0].id, 100, "Economy", "")
-
-    def test_cannot_add_row_with_blank_seats(self):
-        airline = get_airline("British Airways")
-        layouts = list_layouts(airline.id)
-        with self.assertRaises(IntegrityError):
-            add_row_to_layout(layouts[0].id, 100, "Economy", "         ")

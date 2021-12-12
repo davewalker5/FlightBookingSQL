@@ -12,6 +12,36 @@ from flight_model.logic import create_passenger, delete_passenger
 passengers_bp = Blueprint("passengers", __name__, template_folder='templates')
 
 
+def _render_passenger_addition_page(flight_id, error):
+    """
+    Helper to render the airline editing page
+
+    :param flight_id: ID for the flight to which to add passengers
+    :param error: Error message to display on the page or None
+    :return: The rendered passenger addition template
+    """
+    return render_template("passengers/add.html",
+                           flight=get_flight(flight_id),
+                           error=error)
+
+
+def _render_seat_allocation_page(flight_id, passenger_id, error):
+    """
+    Helper to render the page to allocate a seat to a passenger
+
+    :param flight_id: ID of the flight the passenger is associated with
+    :param passenger_id: Unique identifier for the passenger to allocate to a seat
+    :param error: Error message to display on the page or None
+    :return: The HTML for the seat allocation page
+    """
+    flight = get_flight(flight_id)
+    passengers = [p for p in flight.passengers if p.id == passenger_id]
+    return render_template("passengers/allocate.html",
+                           flight=flight,
+                           passengers=passengers,
+                           error=error)
+
+
 @passengers_bp.route("/list/<int:flight_id>")
 def list_all(flight_id):
     """
@@ -51,13 +81,9 @@ def add(flight_id):
             add_passenger(flight_id, passenger)
             return redirect(f"/passengers/list/{flight_id}")
         except ValueError as e:
-            return render_template("passengers/add.html",
-                                   flight=get_flight(flight_id),
-                                   error=e)
+            return _render_passenger_addition_page(flight_id, e)
     else:
-        return render_template("passengers/add.html",
-                               flight=get_flight(flight_id),
-                               error=None)
+        return _render_passenger_addition_page(flight_id, None)
 
 
 @passengers_bp.route("/delete/<int:flight_id>/<int:passenger_id>", methods=["GET", "POST"])
@@ -80,23 +106,6 @@ def delete(flight_id, passenger_id):
                            passengers=passengers,
                            flight=flight,
                            edit_enabled=False)
-
-
-def _render_seat_allocation_page(flight_id, passenger_id, error):
-    """
-    Helper to render the page to allocate a seat to a passenger
-
-    :param flight_id: ID of the flight the passenger is associated with
-    :param passenger_id: Unique identifier for the passenger to allocate to a seat
-    :param error: Error message to display on the page or None
-    :return: The HTML for the seat allocation page
-    """
-    flight = get_flight(flight_id)
-    passengers = [p for p in flight.passengers if p.id == passenger_id]
-    return render_template("passengers/allocate.html",
-                           flight=flight,
-                           passengers=passengers,
-                           error=error)
 
 
 @passengers_bp.route("/allocate/<int:flight_id>/<int:passenger_id>", methods=["GET", "POST"])

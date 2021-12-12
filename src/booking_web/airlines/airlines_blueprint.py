@@ -9,6 +9,20 @@ from flight_model.logic import list_airlines, create_airline, delete_airline, ge
 airlines_bp = Blueprint("airlines", __name__, template_folder='templates')
 
 
+def _render_airline_editing_page(airline_id, error):
+    """
+    Helper to render the airline editing page
+
+    :param airline_id: ID for the airline to edit
+    :param error: Error message to display on the page or None
+    :return: The rendered airline editing template
+    """
+    airline = get_airline(airline_id) if airline_id else None
+    return render_template("airlines/edit.html",
+                           airline=airline,
+                           error=error)
+
+
 @airlines_bp.route("/list")
 def list_all():
     """
@@ -38,15 +52,9 @@ def edit(airline_id):
                 _ = create_airline(request.form["name"])
             return redirect("/airlines/list")
         except ValueError as e:
-            airline = get_airline(airline_id) if airline_id else None
-            return render_template("airlines/edit.html",
-                                   airline=airline,
-                                   error=e)
+            return _render_airline_editing_page(airline_id, e)
     else:
-        airline = get_airline(airline_id) if airline_id else None
-        return render_template("airlines/edit.html",
-                               airline=airline,
-                               error=None)
+        return _render_airline_editing_page(airline_id, None)
 
 
 @airlines_bp.route("/delete/<int:airline_id>", methods=["GET", "POST"])
