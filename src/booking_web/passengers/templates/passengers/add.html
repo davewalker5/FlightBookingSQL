@@ -37,7 +37,13 @@
 
         <div class="button-bar">
             <button type="button" class="btn btn-light">
-                <a href="{{ url_for('passengers.list_all', flight_id=flight.id) }}">Cancel</a>
+                {% if flight.passengers | length > 0 %}
+                    <a href="{{ url_for('passengers.list_all', flight_id=flight.id) }}">
+                {% else %}
+                    <a href="{{ url_for('flights.list_all') }}">
+                {% endif %}
+                    Cancel
+                </a>
             </button>
             <button type="submit" value="create" class="btn btn-primary">Add Passenger</button>
         </div>
