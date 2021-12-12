@@ -65,6 +65,7 @@ class RowDefinition(Base):
 
     __table_args__ = (
         UniqueConstraint('aircraft_layout_id', 'number', name='AIRLINE_AIRCRAFT_LAYOUT_UX'),
+        CheckConstraint("LENGTH(TRIM(seating_class)) > 0"),
         CheckConstraint("LENGTH(TRIM(seats)) > 0")
     )
 

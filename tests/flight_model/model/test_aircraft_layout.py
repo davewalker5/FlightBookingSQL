@@ -108,7 +108,7 @@ class TestAircraftLayout(unittest.TestCase):
             self.assertFalse(5 in row_numbers)
             self.assertEqual(9, len(aircraft_layout.row_definitions))
 
-    def test_cannot_add_row_with_empty_seats(self):
+    def test_cannot_add_row_with_blank_seats(self):
         with self.assertRaises(IntegrityError), Session.begin() as session:
             aircraft_layout = session.query(AircraftLayout).one()
             row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
@@ -117,7 +117,7 @@ class TestAircraftLayout(unittest.TestCase):
                                            seats="")
             session.add(row_definition)
 
-    def test_cannot_add_row_with_blanks_seats(self):
+    def test_cannot_add_row_with_whitespace_seats(self):
         with self.assertRaises(IntegrityError), Session.begin() as session:
             aircraft_layout = session.query(AircraftLayout).one()
             row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
@@ -125,3 +125,41 @@ class TestAircraftLayout(unittest.TestCase):
                                            seating_class="Economy",
                                            seats="         ")
             session.add(row_definition)
+
+    def test_cannot_add_row_with_blank_class(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
+                                           number=100,
+                                           seating_class="",
+                                           seats="ABCDEF")
+            session.add(row_definition)
+
+    def test_cannot_add_row_with_whitespace_class(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            aircraft_layout = session.query(AircraftLayout).one()
+            row_definition = RowDefinition(aircraft_layout_id=aircraft_layout.id,
+                                           number=100,
+                                           seating_class="       ",
+                                           seats="ABCDEF")
+            session.add(row_definition)
+
+    def test_cannot_update_seats_to_empty(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            row_definition = session.query(RowDefinition).all()[0]
+            row_definition.seats = ""
+
+    def test_cannot_update_seats_to_whitespace(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            row_definition = session.query(RowDefinition).all()[0]
+            row_definition.seats = "       "
+
+    def test_cannot_update_class_to_empty(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            row_definition = session.query(RowDefinition).all()[0]
+            row_definition.seating_class = ""
+
+    def test_cannot_update_class_to_whitespace(self):
+        with self.assertRaises(IntegrityError), Session.begin() as session:
+            row_definition = session.query(RowDefinition).all()[0]
+            row_definition.seating_class = "       "

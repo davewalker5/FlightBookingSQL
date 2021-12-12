@@ -5,8 +5,8 @@ The layouts blueprint supplies view functions and templates for aircraft layout 
 from flask import Blueprint, render_template, redirect, request
 from flight_model.logic import get_flight
 from flight_model.logic import list_airlines
-from flight_model.logic import list_layouts, apply_aircraft_layout, get_layout, delete_layout, update_layout, \
-    delete_row_from_layout
+from flight_model.logic import list_layouts, apply_aircraft_layout, get_layout, delete_layout, update_layout
+from flight_model.logic import delete_row_from_layout, update_row_definition
 from flight_model.data_exchange import import_aircraft_layout_from_stream
 
 
@@ -71,6 +71,23 @@ def _render_layout_deletion_page(layout_id, error):
                            layouts=[get_layout(layout_id)],
                            error=error,
                            edit_enabled=error)
+
+
+def _render_row_editing_page(layout_id, row_number, error):
+    """
+    Helper to render the aircraft layout row definition editing page
+
+    :param layout_id: ID for the aircraft layout
+    :param row_number: Row number to edit
+    :param error: Error message to display on the page or None
+    :return: The rendered row editing template
+    """
+    layout = get_layout(layout_id)
+    row = [row for row in layout.row_definitions if row.number == row_number][0]
+    return render_template("layouts/edit_row.html",
+                           layout=get_layout(layout_id),
+                           row=row,
+                           error=error)
 
 
 def _render_row_deletion_page(layout_id, row_number, error):
@@ -172,6 +189,25 @@ def edit(layout_id):
             return _render_layout_editing_page(layout_id, e)
     else:
         return _render_layout_editing_page(layout_id, None)
+
+
+@layouts_bp.route("/edit_row/<int:layout_id>/<int:row_number>", methods=["GET", "POST"])
+def edit_row(layout_id, row_number):
+    """
+    Serve the page to edit an aircraft layout row definition and handle the edit when the form is submitted
+
+    :param layout_id: ID for the layout from which to delete a row
+    :param row_number: Row number to edit
+    :return: The rendered row editing template or a redirect to the row list page
+    """
+    if request.method == "POST":
+        try:
+            update_row_definition(layout_id, row_number, request.form["seating_class"], request.form["letters"])
+            return redirect(f"/layouts/list_rows/{layout_id}")
+        except ValueError as e:
+            return _render_row_editing_page(layout_id, row_number, e)
+    else:
+        return _render_row_editing_page(layout_id, row_number, None)
 
 
 @layouts_bp.route("/delete/<int:layout_id>", methods=["GET", "POST"])

@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Edit Row Definition - {{ layout.aircraft }} {{ layout.name }}{% endblock %}
+
+{% block content %}
+    <h1>Edit Row Definition - {{ layout.aircraft }} {{ layout.name }}</h1>
+    {% include "error.html" with context %}
+    <form method="post">
+        <div class="form-group">
+            <label>Row Number</label>
+            <input class="form-control" value="{{ row.number }}" readonly>
+        </div>
+        <div class="form-group">
+            <label>Seating Class</label>
+            <input class="form-control" name="seating_class" value="{{ row.seating_class }}" required>
+        </div>
+        <div class="form-group">
+            <label>Seat Letters</label>
+            <input class="form-control" name="letters" value="{{ row.seats }}" required>
+        </div>
+        <div class="button-bar">
+            <button type="button" class="btn btn-light">
+                <a href="{{ url_for('layouts.list_rows', layout_id=layout.id) }}">Cancel</a>
+            </button>
+            <button type="submit" value="create" class="btn btn-primary">Save Row Definition</button>
+        </div>
+    </form>
+{% endblock %}
