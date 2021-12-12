@@ -46,7 +46,7 @@ def _render_seat_allocation_page(flight_id, passenger_id, error):
 def list_all(flight_id):
     """
     Serve the page showing passenger details and their seat allocations. From this page, seat allocations can
-    be added and changed and passengers can be removed from the flight.
+    be added and changed and passengers can be added to and removed from the flight.
 
     :return: The HTML for the passenger details page
     """
@@ -57,8 +57,7 @@ def list_all(flight_id):
                                passengers=flight.passengers,
                                edit_enabled=True)
     else:
-        session["message"] = "There are no passengers on the flight"
-        return redirect("/")
+        return redirect(f"/passengers/add/{flight_id}")
 
 
 @passengers_bp.route("/add/<int:flight_id>", methods=["GET", "POST"])
