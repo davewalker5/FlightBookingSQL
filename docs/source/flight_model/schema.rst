@@ -1,167 +1,39 @@
-.. image:: https://img.shields.io/github/issues/davewalker5/FlightBookingSQL
-    :target: https://github.com/davewalker5/FlightBookingSQL/issues
-    :alt: GitHub issues
+Database Schema and Database Creation
+=====================================
 
-.. image:: https://img.shields.io/github/v/release/davewalker5/FlightBookingSQL.svg?include_prereleases
-    :target: https://github.com/davewalker5/FlightBookingSQL/releases
-    :alt: Releases
-
-.. image:: https://img.shields.io/badge/License-mit-blue.svg
-    :target: https://github.com/davewalker5/FlightBookingSQL/blob/main/LICENSE
-    :alt: License
-
-.. image:: https://img.shields.io/badge/language-python-blue.svg
-    :target: https://www.python.org
-    :alt: Language
-
-.. image:: https://img.shields.io/github/languages/code-size/davewalker5/FlightBookingSQL
-    :target: https://github.com/davewalker5/FlightBookingSQL/
-    :alt: GitHub code size in bytes
+The flight booking application has a SQLite back-end with the following schema:
 
 
-Airline Booking System with SQLite Back-End
-===========================================
-
-A tutorial/demonstration project implementing a Python web application for creating and managing airline flight
-bookings and passengers. The project has a Flask-based web front end and a SQLite back-end with SQLAlchemy for
-data access.
+.. image:: images/schema.png
+    :width: 800
+    :alt: Flight Booking Database Schema
 
 
-Structure
-=========
++-------------------+---------------------------------------------------------------------------------------+
+| Table             | Comments                                                                              |
++-------------------+---------------------------------------------------------------------------------------+
+| AIRPORTS          | Airport definitions                                                                   |
++-------------------+---------------------------------------------------------------------------------------+
+| AIRLINES          | Airline definitions                                                                   |
++-------------------+---------------------------------------------------------------------------------------+
+| PASSENGERS        | Passenger details                                                                     |
++-------------------+---------------------------------------------------------------------------------------+
+| FLIGHTS           | Flight details                                                                        |
++-------------------+---------------------------------------------------------------------------------------+
+| FLIGHT_PASSENGERS | Many-to-many relationships table between flights and passengers                       |
++-------------------+---------------------------------------------------------------------------------------+
+| AIRCRAFT_LAYOUTS  | Container for the row definitions defining the physical seating layout of an aircraft |
++-------------------+---------------------------------------------------------------------------------------+
+| ROW_DEFINITIONS   | Row definition defining the seating layout for a numbered row in an aircraft          |
++-------------------+---------------------------------------------------------------------------------------+
+| SEATS             | Seats on a flight that can be allocated to passengers                                 |
++-------------------+---------------------------------------------------------------------------------------+
 
-+-------------------------------+---------------------------------------------------------------------+
-| **Package**                   | **Contents**                                                        |
-+-------------------------------+---------------------------------------------------------------------+
-| flight_model                  | Classes and business logic for the booking system                   |
-+-------------------------------+---------------------------------------------------------------------+
-| booking_web                   | A simple Flask-based web site built over the flight_booking package |
-+-------------------------------+---------------------------------------------------------------------+
-
-
-Running the Application
-=======================
-
-To run the application, a virtual environment should be created, the requirements should be installed using pip and the
-environment should be activated.
-
-With those pre-requisites in place, to populate the database with sample data run the following commands from the
-"src" folder:
+To (re)create the SQLite database file, run the flight_module.model package at the console:
 
 ::
 
-    export FLIGHT_BOOKING_DB="`pwd`/../data/flight_booking.db"
-    python -m flight_model
+    python -m flight_module.model
 
-With the sample data in place, to run the web-based application in the Flask development web server, enter the
-following from the "src/booking_web" folder:
-
-::
-
-    export FLIGHT_BOOKING_DB="`pwd`/../../data/flight_booking.db"
-    export PYTHONPATH=`pwd`/..
-    export FLASK_APP=booking.py
-    export FLASK_ENV=development
-    flask run
-
-The first three commands will need to be modified based on the current operating system. Once the development server
-is running, browse to the following URL in a  web browser:
-
-::
-
-    http://127.0.0.1:5000/
-
-
-Unit Tests and Coverage
-=======================
-
-Currently, the unit tests use a SQLite database as the back-end rather than mocking the database.
-
-To run the unit tests, a virtual environment should be created, the requirements should be installed using pip and the
-environment should be activated.
-
-The tests can then be run from the command line, at the root of the project folder, as follows:
-
-::
-
-    export PYTHONPATH=`pwd`/src/
-    python -m unittest
-
-The first command adds the source folder, containing the two packages under test, to the PYTHONPATH environment
-variable so the packages will be found when the tests attempt to import them. The command will need to be modified
-based on the current operating system.
-
-Similarly, a coverage report can be generated by running the following commands from the root of the project folder:
-
-::
-
-    export PYTHONPATH=`pwd`/src/
-    coverage run --branch --source src -m unittest discover
-    coverage html -d cov_html
-
-This will create a folder "cov_html" containing the coverage report in HTML format.
-
-
-Generating Documentation
-========================
-
-To generate the documentation, a virtual environment should be created, the requirements should be installed
-using pip and the environment should be activated.
-
-HTML documentation can then be created by running the following commands from the "docs" sub-folder:
-
-::
-
-    export PYTHONPATH=`pwd`/../src/
-    make html
-
-The resulting documentation is written to the docs/build/html folder and can be viewed by opening "index.html" in a
-web browser.
-
-
-Dependencies
-============
-
-The flight booking application has dependencies listed in requirements.txt and also requires that PDF boarding card
-generator is installed to enable generation and saving of boarding cards. The boarding card generators are part of the
-FlightBooking repository:
-
-https://github.com/davewalker5/FlightBookingSQL
-
-Please see the README files for that repository for further details.
-
-
-Distribution
-============
-
-A distribution can be created that includes both the "flight_model" and "booking_web" packages by running the
-following from a command prompt at the root of the project:
-
-::
-
-    python setup.py bdist_wheel
-
-Note that the project's virtual environment should **not** be activated when creating distributions.
-
-
-License
-=======
-
-This software is licensed under the MIT License:
-
-https://opensource.org/licenses/MIT
-
-Copyright 2021 David Walker
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
-persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
-Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+The existing database file will be deleted, if present, and a new one created with an up-to-date model. It will also
+be populated with sample airport, airline, aircraft, flight and passenger data.
